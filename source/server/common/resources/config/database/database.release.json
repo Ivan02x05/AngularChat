@@ -1,0 +1,22 @@
+{
+    "connection": {
+        "default": {
+            "host": "localhost",
+            "database": "Angular",
+            "port": 27017,
+            "options": {
+                "user": "AngularUser",
+                "pass": "P@ssword!"
+            }
+        }
+    },
+    "retry": {
+        "chat_message": {
+            "count": 10,
+            "second": 3
+        }
+    },
+    "select_count" : {
+        "chat_message": 20
+    }
+}

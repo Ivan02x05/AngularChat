@@ -1,0 +1,22 @@
+<angular-header (onTop)="onTop();"></angular-header>
+<div class="main">
+    <div class="col-md-5">
+        <div class="form-group col-md-10">
+            <input type="text" class="form-control" placeholder="Search" [(ngModel)]="filter">
+        </div>
+        <button type="button" class="btn btn-primary" (click)="create();" title="新規">
+            <span class="glyphicon glyphicon-plus"></span>
+        </button>
+        <div class="col-md-12 padding-left-0">
+            <div class="list-group chat-list-group">
+                <a *ngFor="#chat of chats | chatfilter:filter" class="list-group-item" [class.active]="chat.active" (click)="select(chat);">
+                    {{chat.title}}
+                    <span class="badge" *ngIf="chat.unread != null">{{chat.unread}}</span>
+                </a>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-7">
+        <router-outlet></router-outlet>
+    </div>
+</div>

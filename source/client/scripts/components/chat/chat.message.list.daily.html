@@ -1,0 +1,13 @@
+<div *ngFor="#daily of dailymessages, #i=index">
+    <div class="chat-message border-bottom-1" style="background-color:#337ab7;">
+        <p>
+            <a data-toggle="collapse" [href]="'#daily_'+i" style="color:white;">{{daily.date | date: "fullDate"}}</a>
+        </p>
+    </div>
+    <div [id]="'daily_'+i" class="collapse">
+        <chat-message-list [chat]="chat" [messages]="daily.messages"></chat-message-list>
+        <div class="chat-message" *ngIf="daily.unshown != null && daily.unshown != 0">
+            <button class="btn btn-success btn-block btn-sm" [disabled]="connecting"  (click)="getMessageList(daily);">show more ({{daily.unshown}})</button>
+        </div>
+    </div>
+</div>

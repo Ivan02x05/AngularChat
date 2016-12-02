@@ -1,0 +1,81 @@
+<div class="panel panel-default">
+    <div class="panel-heading user-heading">
+        <strong>{{isNew ? "新規作成" : "登録情報訂正"}}</strong>
+    </div>
+    <div class="panel-body">
+        <form #frm="ngForm" class="form-horizontal" *ngIf="model">
+            <form-error></form-error>
+            <div class="form-group">
+                <label for="userId" class="control-label col-md-3">ユーザID</label>
+                <div class="col-md-9">
+                    <input type="text" [(ngModel)]="model.userId" ngControl="userId" id="userId" #userId="ngForm"
+                           control-name="ユーザID" class="form-control" placeholder="User Id" required-validator justlength-validator="6" maxlength="6">
+                   <control-error [target]="userId"></control-error>
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="lastname" class="control-label col-md-3">姓</label>
+                <div class="col-md-9">
+                    <input type="text" [(ngModel)]="model.name.last" ngControl="lastname" id="lastname" #lastname="ngForm"
+                           control-name="姓" class="form-control" placeholder="Last Name" required-validator maxlength="20">
+                    <control-error [target]="lastname"></control-error>
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="firstname" class="control-label col-md-3">名</label>
+                <div class="col-md-9">
+                    <input type="text" [(ngModel)]="model.name.first" ngControl="firstname" id="firstname" #firstname="ngForm"
+                           control-name="名" class="form-control" placeholder="First Name" required-validator maxlength="20">
+                    <control-error [target]="firstname"></control-error>
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="password" class="control-label col-md-3">パスワード</label>
+                <div class="col-md-9">
+                    <input type="password" [(ngModel)]="model.password" (change)="onPasswordChange()" ngControl="password" id="password" #password="ngForm" #passwordHtml
+                           control-name="パスワード" class="form-control" placeholder="Password" [required-validator]="isNew" minlength-validator="10"
+                           maxlength="20">
+                   <control-error [target]="password"></control-error>
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="password2" class="control-label col-md-3">確認用パスワード</label>
+                <div class="col-md-9">
+                    <input type="password" [(ngModel)]="model.password2" ngControl="password2" id="password2" #password2="ngForm"
+                           control-name="確認用パスワード" class="form-control" placeholder="Password" [required-validator]="isNew" minlength-validator="10"
+                           [equals-validator]="passwordHtml" maxlength="20">
+                   <control-error [target]="password2"></control-error>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="control-label col-md-3">閲覧モード</label>
+                <div class="col-md-9">
+                    <division-radio [code]="division.Code.DISPLAY_MODE" [(ngModel)]="model.mode"
+                        ngControl="mode" #mode="ngForm" control-name="閲覧モード" required-validator></division-radio>
+                    <control-error [target]="mode"></control-error>
+                </div>
+            </div>
+            <div class="form-group" *ngIf="user.isAdmin && user._id != model._id">
+                <label class="control-label col-md-3">権限</label>
+                <div class="col-md-9">
+                    <division-radio [code]="division.Code.ROLE" [(ngModel)]="model.role"
+                        ngControl="role" #role="ngForm" control-name="権限" required-validator></division-radio>
+                    <control-error [target]="role"></control-error>
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-md-12 text-right">
+                    <button type="button" class="btn btn-primary btn-sm" *ngIf="isNew" [disabled]="!frm.valid" (click)="regist();">
+                        登録
+                    </button>
+                    <button type="button" class="btn btn-primary btn-sm" *ngIf="!isNew && user.isAdmin && user._id != model._id" (click)="delete();">
+                        削除
+                    </button>
+                    <button type="button" class="btn btn-primary btn-sm" *ngIf="!isNew" [disabled]="!frm.valid" (click)="update();">
+                        更新
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>

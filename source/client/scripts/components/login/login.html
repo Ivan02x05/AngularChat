@@ -1,0 +1,33 @@
+<angular-header></angular-header>
+<div class="login">
+    <div class="col-md-2 hidden-md"></div>
+    <div class="col-md-6">
+        <form #loginForm="ngForm" class="form-horizontal">
+            <form-error></form-error>
+            <div class="form-group">
+                <label for="userId" class="control-label col-md-4">ユーザID</label>
+                <div class="col-md-8">
+                    <input type="text" [(ngModel)]="model.userId" ngControl="userId" id="userId" #userId="ngForm"
+                           control-name="ユーザID" class="form-control" placeholder="User Id" required-validator justlength-validator="6" maxlength="6">
+                   <control-error [target]="userId"></control-error>
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="password" class="control-label col-md-4">パスワード</label>
+                <div class="col-md-8">
+                    <input type="password" [(ngModel)]="model.password" ngControl="password" id="password" #password="ngForm"
+                           control-name="パスワード" class="form-control" placeholder="Password" required-validator minlength-validator="10"
+                           maxlength="20">
+                   <control-error [target]="password"></control-error>
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-md-4 hidden-md"></div>
+                <div class="col-md-8">
+                    <button type="button" class="btn btn-primary btn-block" [disabled]="!loginForm.valid"  (click)="login();">ログイン</button>
+                </div>
+            </div>
+        </form>
+    </div>
+    <div class="col-md-4 hidden-md"></div>
+</div>

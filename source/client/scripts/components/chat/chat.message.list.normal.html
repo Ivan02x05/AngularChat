@@ -1,0 +1,4 @@
+<chat-message-list [chat]="chat" [messages]="messages.messages"></chat-message-list>
+<div class="chat-message" *ngIf="messages.unshown != null && messages.unshown != 0">
+    <button class="btn btn-success btn-block btn-sm" [disabled]="connecting"  (click)="getMessageList();">show more ({{messages.unshown}})</button>
+</div>

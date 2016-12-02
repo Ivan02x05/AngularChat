@@ -1,0 +1,3 @@
+<label *ngFor="#user of users | onlychecked:onlychecked" class="checkbox-inline" style="margin-left:0px; margin-right:10px;">
+    <input type="checkbox" [ngModel]="user.selected" (ngModelChange)="onChange($event, user);" (blur)="onTouched();" [disabled]="disabled">{{user.fullname}}
+</label>

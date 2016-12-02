@@ -1,0 +1,14 @@
+{
+  "port": "8090",
+  "session_name": "chat_application",
+  "session_secret_key": "b747cc73-4b39-4f04-b9f8-224def17e498",
+  "interval": {
+    "updateSession": 60,
+    "saveViewd": 60
+  },
+  "material": {
+      "chat": {
+          "path": "materials/chat"
+      }
+  }
+}

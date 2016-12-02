@@ -1,0 +1,6 @@
+{
+    "secret_key": "b747cc73-4b39-4f04-b9f8-224def17e498",
+    "algorithm": "aes192",
+    "input_encoding": "utf8",
+    "output_encoding": "hex"
+}

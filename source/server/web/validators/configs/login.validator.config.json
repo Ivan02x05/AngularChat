@@ -1,0 +1,21 @@
+{
+    "index":{},
+    "login":{
+        "userId":{
+            "name":"ユーザID",
+            "validators":{
+                "required":"",
+                "justlength":{"length":6}
+            }
+        },
+        "password":{
+            "name":"パスワード",
+            "validators":{
+                "required":"",
+                "minlength":{"length":10},
+                "maxlength":{"length":20}
+            }
+        }
+    },
+    "logout":{}
+}

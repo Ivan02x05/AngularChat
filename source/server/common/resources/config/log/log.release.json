@@ -1,0 +1,35 @@
+{
+    "appenders": [
+        {
+            "type":     "dateFile",
+            "category": "www",
+            "filename": "logs/www/www.log",
+            "pattern":  "-yyyy-MM-dd"
+        },
+        {
+            "type":     "dateFile",
+            "category": "access",
+            "filename": "logs/access/access.log",
+            "pattern":  "-yyyy-MM-dd"
+        },
+        {
+            "type":     "dateFile",
+            "category": "error",
+            "filename": "logs/error/error.log",
+            "pattern":  "-yyyy-MM-dd"
+        },
+        {
+            "type":     "dateFile",
+            "category": "system",
+            "filename": "logs/system/system.log",
+            "pattern":  "-yyyy-MM-dd"
+        },
+        {
+            "type":     "dateFile",
+            "category": "db",
+            "filename": "logs/db/db.log",
+            "pattern":  "-yyyy-MM-dd"
+        }
+    ],
+    "levels": {"www": "INFO", "access": "INFO", "error": "ERROR", "system": "INFO", "db": "INFO"}
+}

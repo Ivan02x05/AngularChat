@@ -1,0 +1,28 @@
+<angular-header></angular-header>
+<div class="main">
+    <div class="col-md-5">
+        <div class="form-group col-md-10">
+            <input type="text" class="form-control" placeholder="Search" [(ngModel)]="filter">
+        </div>
+        <button type="button" *ngIf="user.isAdmin" class="btn btn-primary" (click)="create();" title="新規">
+            <span class="glyphicon glyphicon-plus"></span>
+        </button>
+        <div class="col-md-12 padding-left-0">
+            <div *ngIf="user.isAdmin" class="list-group user-list-group">
+                <a *ngFor="#user of users | userfilter:filter" class="list-group-item" [class.active]="user.active" (click)="select(user);">
+                    {{user.fullname}}
+                    <span class="glyphicon glyphicon-fire pull-right" *ngIf="user.logined"></span>
+                </a>
+            </div>
+            <ul *ngIf="!user.isAdmin" class="list-group user-list-group">
+                <li *ngFor="#user of users | userfilter:filter" class="list-group-item" [class.active]="user.active">
+                    {{user.fullname}}
+                    <span class="glyphicon glyphicon-fire pull-right" *ngIf="user.logined"></span>
+                </li>
+            </ul>
+        </div>
+    </div>
+    <div class="col-md-7">
+        <user-edit [service]="service" [target]="target" (onChange)="onChange($event);"></user-edit>
+    </div>
+</div>

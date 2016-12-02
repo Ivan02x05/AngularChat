@@ -1,0 +1,70 @@
+<form #chatForm="ngForm" class="form-horizontal">
+    <form-error></form-error>
+    <fieldset [disabled]="!editable">
+        <div class="form-group" *ngIf="editable">
+            <label for="title" class="control-label col-md-2">タイトル</label>
+            <div class="col-md-10">
+                <input type="text" [(ngModel)]="model.title" ngControl="title" id="title" #title="ngForm"
+                       control-name="タイトル" class="form-control" placeholder="Title" required-validator maxlength-validator="20" maxlength="20">
+               <control-error [target]="title"></control-error>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="control-label col-md-2">公開範囲</label>
+            <div class="col-md-10">
+                <division-radio [code]="division.Code.ACCESS_PERMISSION" [(ngModel)]="model.permission" (change)="onPermissionChange();"
+                    ngControl="permission" #permission="ngForm" control-name="公開範囲" required-validator></division-radio>
+                <control-error [target]="permission"></control-error>
+            </div>
+        </div>
+        <div class="form-group" *ngIf="editable || cache.permission.subcode != division.SubCode.AccessPermission.ALL">
+            <label class="control-label col-md-2">対象者</label>
+            <div class="col-md-10">
+                <users-checkbox [(ngModel)]="model.users" ngControl="users" #users="ngForm" control-name="対象者"
+                    [required-validator]="permission.value == null || permission.value.subcode != division.SubCode.AccessPermission.ALL"
+                    [permission-validator]="permission.value == null || permission.value.subcode != division.SubCode.AccessPermission.ALL"
+                    [disabled]="permission.value != null && permission.value.subcode == division.SubCode.AccessPermission.ALL"
+                    [onlychecked]="!editable">
+                </users-checkbox>
+                <control-error [target]="users"></control-error>
+            </div>
+        </div>
+    </fieldset>
+    <div class="form-group" *ngIf="!editable">
+        <label class="control-label col-md-2">登録情報</label>
+        <div class="col-md-10">
+            <p class="form-control-static">
+                <span>{{model.systemColumn.createUser.fullname}}</span>
+                <span class="padding-left-30">{{model.systemColumn.createDate | date:"medium"}}</span>
+            </p>
+        </div>
+    </div>
+    <div class="form-group" *ngIf="!editable">
+        <label class="control-label col-md-2">更新情報</label>
+        <div class="col-md-10">
+            <p class="form-control-static">
+                <span>{{model.systemColumn.updateUser.fullname}}</span>
+                <span class="padding-left-30">{{model.systemColumn.updateDate | date:"medium"}}</span>
+            </p>
+        </div>
+    </div>
+    <div class="form-group">
+        <div class="col-md-12 text-right">
+            <button class="btn btn-primary btn-sm" *ngIf="editable && !updatable" [disabled]="!chatForm.valid" (click)="regist();">
+                登録
+            </button>
+            <button class="btn btn-primary btn-sm" *ngIf="!editable && authoritative && updatable" (click)="edit();">
+                修正
+            </button>
+            <button class="btn btn-primary btn-sm" *ngIf="editable && updatable" (click)="cancel();">
+                キャンセル
+            </button>
+            <button class="btn btn-primary btn-sm" *ngIf="editable && updatable" (click)="delete();">
+                削除
+            </button>
+            <button class="btn btn-primary btn-sm" *ngIf="editable && updatable" [disabled]="!chatForm.valid" (click)="update();">
+                更新
+            </button>
+        </div>
+    </div>
+</form>

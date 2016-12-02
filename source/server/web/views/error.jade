@@ -1,0 +1,27 @@
+doctype
+
+html(xmlns="http://www.w3.org/1999/xhtml")
+    head
+        meta(charset="utf-8")
+        meta(name="viewport", content="width=device-width, initial-scale=1")
+        meta(http-equiv="X-UA-Compatible", content="IE=edge")
+        
+        title
+            =systemname
+        
+        link(href="./framework/bootstrap/dist/css/bootstrap.min.css", type="text/css",rel="stylesheet")
+        link(href="./styles/common.css", type="text/css", rel="stylesheet")
+        
+        script(src="./framework/jquery-2.2.0.min.js")
+        script(src="./framework/bootstrap/dist/js/bootstrap.min.js")
+        
+    body
+        div(class="container")
+            div(class="header")
+                div(class="pull-right")
+                    a(class="nav-link" onClick="location.href='login/index'") login
+                h3(class="text-muted") CTSチャットルーム
+            div(class="main")
+                strong Error!
+                br
+                =error.message

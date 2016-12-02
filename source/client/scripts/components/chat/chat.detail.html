@@ -1,0 +1,37 @@
+<div class="panel panel-default">
+    <div class="panel-heading chat-heading">
+        <strong>{{chat ? chat.title : ""}}</strong>
+    </div>
+    <div class="panel-body chat-btn-list border-bottom-1">
+        <div class="btn-group" data-toggle="buttons" *ngIf="toggled">
+            <label class="btn btn-xs btn-primary" [class.active]="mode==modes.Normal" (click)="onModeChange(modes.Normal);">
+                <input type="radio" name="mode" id="mode_normal" />一覧
+            </label>
+            <label class="btn btn-xs btn-primary" [class.active]="mode==modes.Daily" (click)="onModeChange(modes.Daily);">
+                <input type="radio" name="mode" id="mode_dailly" />日別
+            </label>
+            <label class="btn btn-xs btn-primary" [class.active]="mode==modes.Search" (click)="onModeChange(modes.Search);">
+                <input type="radio" name="mode" id="mode_search" />検索
+            </label>
+        </div>
+        <button class="btn btn-link btn-xs pull-right" *ngIf="toggled" [disabled]="chat==null"  (click)="toggle();">詳細情報</button>
+        <button class="btn btn-link btn-xs pull-right" *ngIf="!toggled"  (click)="toggle();">メッセージ一覧</button>
+    </div>
+    <div class="panel-body chat-data-update" *ngIf="!toggled">
+        <chat-edit [model]="chat"></chat-edit>
+    </div>
+    <div class="panel-body chat-message-input border-bottom-1" *ngIf="chat != null && toggled">
+        <chat-message-regist #inputCmp [chat]="chat" *ngIf="mode!=modes.Search"></chat-message-regist>
+        <chat-message-search #inputCmp [chat]="chat" *ngIf="mode==modes.Search"></chat-message-search>
+    </div>
+    <div class="panel-body chat-message-list border-bottom-1" [class.chat-message-list-error]="hasInputError" *ngIf="chat != null && messages != null && toggled">
+        <chat-message-list-normal #outputCmpl [chat]="chat" [messages]="messages" *ngIf="mode==modes.Normal"></chat-message-list-normal>
+        <chat-message-list-daily #outputCmpl [chat]="chat" [messages]="messages" *ngIf="mode==modes.Daily"></chat-message-list-daily>
+        <chat-message-list-search #outputCmpl [chat]="chat" [messages]="messages" *ngIf="mode==modes.Search"></chat-message-list-search>
+    </div>
+    <div class="panel-body chat-btn-list" *ngIf="chat != null && messages != null && toggled">
+        <button class="btn btn-primary btn-xs" [disabled]="downloading" (click)="onDownloadDisped();">ダウンロード(表示のみ)</button>
+        <button class="btn btn-primary btn-xs" [disabled]="downloading" (click)="onDownloadAll();">ダウンロード(全件)</button>
+        <a href="#" style="display:none" #downloadBtn download="messages.csv" (click)="onDownloadCommon();"></a>
+    </div>
+</div>

@@ -1,0 +1,10 @@
+<div>
+    <form #msgForm="ngForm" class="form-horizontal">
+        <form-error></form-error>
+        <textarea [(ngModel)]="message" (keydown)="onMessageKeyDown($event);" (drop)="onDrop($event);"
+            class="form-control" placeholder="Message"></textarea>
+    </form>
+    <button type="button" class="btn btn-primary pull-right" [disabled]="!message" (click)="addMessage();" title="つぶやき(Ctrl+Enter)">
+        <span class="glyphicon glyphicon-plus"></span>
+    </button>
+</div>

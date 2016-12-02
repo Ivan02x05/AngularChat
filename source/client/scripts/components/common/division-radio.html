@@ -1,0 +1,3 @@
+<label *ngFor="#division of divisions" class="radio-inline" style="margin-left:0px; margin-right:10px;">
+    <input type="radio" (click)="onChange(division);" (blur)="onTouched();" [name]="name" [checked]="_value && _value.subcode == division.subcode">{{division.value}}
+</label>
