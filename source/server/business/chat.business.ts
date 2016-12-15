@@ -1,11 +1,9 @@
-/// <reference path="../../../typings/tsd.d.ts"/>
-
 import * as Q from "q";
 
 import BaseBusiness from "./common/base.business";
 import ChatSchema from "../database/schemas/chat.schema";
-import ChatModel from "../../common/models/impl/chat/chat.model";
-import UserModel from "../../common/models/impl/common/user.model";
+import ChatIOModel from "../../common/models/io/chat/chat.io.model";
+import UserIOModel from "../../common/models/io/common/user.io.model";
 import {ErrorConstant} from "../../common/constants/error.constant";
 import {CodeConstant} from "../../common/constants/code.constant";
 import {DataBaseConstant} from "../common/constants/database.constant";
@@ -14,7 +12,7 @@ import UserBusiness from "./user.business";
 import SequenceBusiness from "./sequence.business";
 
 class ChatBusiness extends BaseBusiness {
-    public getPermissionChats(user: UserModel): Q.Promise<ChatModel[]> {
+    public getPermissionChats(user: UserIOModel): Q.Promise<ChatIOModel[]> {
         var cond = { "systemColumn.deleteFlag": false };
         if (!user.isAdmin)
             cond["$or"] = [
@@ -25,27 +23,27 @@ class ChatBusiness extends BaseBusiness {
 
         return this.database.model(ChatSchema)
             .find(cond, null, options)
-            .then(result => result.map(_ => new ChatModel(_)));
+            .then(result => result.map(_ => new ChatIOModel(_)));
     }
 
-    public findById(id: any): Q.Promise<ChatModel> {
+    public findById(id: any): Q.Promise<ChatIOModel> {
         return this.database.model(ChatSchema)
             .findById(id)
             .then(result => {
                 if (result && !result.systemColumn.deleteFlag)
-                    return new ChatModel(result);
+                    return new ChatIOModel(result);
                 else
                     return null;
             });
     }
 
-    public findByCode(code: number): Q.Promise<ChatModel> {
+    public findByCode(code: number): Q.Promise<ChatIOModel> {
         return this.database.model(ChatSchema)
             .find({ code: code, "systemColumn.deleteFlag": false })
-            .then(result => result.length > 0 ? new ChatModel(result[0]) : null);
+            .then(result => result.length > 0 ? new ChatIOModel(result[0]) : null);
     }
 
-    public regist(model: ChatModel): Q.Promise<ChatModel> {
+    public regist(model: ChatIOModel): Q.Promise<ChatIOModel> {
         var chats = this.database.model(ChatSchema);
         return this.getComponent(SequenceBusiness)
             .next(DataBaseConstant.Sequence.CHAT)
@@ -57,10 +55,10 @@ class ChatBusiness extends BaseBusiness {
 
                 return chats.save(chat);
             })
-            .then(result => new ChatModel(result));
+            .then(result => new ChatIOModel(result));
     }
 
-    public update(model: ChatModel): Q.Promise<ChatModel> {
+    public update(model: ChatIOModel): Q.Promise<ChatIOModel> {
         var chats = this.database.model(ChatSchema);
         return chats
             .findById(model._id)
@@ -74,13 +72,13 @@ class ChatBusiness extends BaseBusiness {
                 _.systemColumn.version = model.systemColumn.version;
                 return chats.save(_);
             })
-            .then(result => new ChatModel(result));
+            .then(result => new ChatIOModel(result));
     }
 
-    public delete(model: ChatModel): Q.Promise<ChatModel> {
+    public delete(model: ChatIOModel): Q.Promise<ChatIOModel> {
         return this.database.model(ChatSchema)
             .delete(model)
-            .then(result => new ChatModel(result));
+            .then(result => new ChatIOModel(result));
     }
 }
 

@@ -2,25 +2,25 @@ import {Injectable} from  "angular2/core";
 import * as rxjs from "rxjs/Rx";
 
 import DivisionService from "../services/division.http.service";
-import DivisionModel from "../../../common/models/impl/common/division.model";
+import DivisionIOModel from "../../../common/models/io/common/division.io.model";
 
 @Injectable()
 class DivisionManerger {
     private observable: rxjs.Observable<DivisionManerger>;
-    private divisions: Map<string, Map<string, DivisionModel>> =
-    new Map<string, Map<string, DivisionModel>>();
+    private divisions: Map<string, Map<string, DivisionIOModel>> =
+    new Map<string, Map<string, DivisionIOModel>>();
 
     constructor(service: DivisionService) {
         this.observable = rxjs.Observable.create((observer) => {
             service.list()
-                .map((response) => <DivisionModel[]>response.models.divisions)
+                .map((response) => <DivisionIOModel[]>response.models.divisions)
                 .subscribe(
                 (divisions) => {
                     divisions.map(_ => {
                         if (!this.divisions.has(_.code))
-                            this.divisions.set(_.code, new Map<string, DivisionModel>());
+                            this.divisions.set(_.code, new Map<string, DivisionIOModel>());
 
-                        this.divisions.get(_.code).set(_.subcode, new DivisionModel(_));
+                        this.divisions.get(_.code).set(_.subcode, new DivisionIOModel(_));
                     });
                     observer.next(this);
                     observer.complete();
@@ -33,7 +33,7 @@ class DivisionManerger {
         return this.observable;
     }
 
-    public getDivision(code: string, subcode: string): DivisionModel {
+    public getDivision(code: string, subcode: string): DivisionIOModel {
         if (this.divisions.has(code)
             && this.divisions.get(code).has(subcode))
             return this.divisions.get(code).get(subcode);
@@ -49,8 +49,8 @@ class DivisionManerger {
             return null;
     }
 
-    public getDivisions(code: string): DivisionModel[] {
-        var divisions: DivisionModel[] = [];
+    public getDivisions(code: string): DivisionIOModel[] {
+        var divisions: DivisionIOModel[] = [];
         if (this.divisions.has(code)) {
             this.divisions.get(code)
                 .forEach(v => {

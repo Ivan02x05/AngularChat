@@ -1,10 +1,10 @@
 import BaseSchema from "./base.schema";
-import {SequenceModel, SequenceDocument} from "../models/sequence.model";
+import {SequenceDBModel, SequenceDocument} from "../models/sequence.db.model";
 import {DataBaseConstant} from "../../common/constants/database.constant";
 
-export {SequenceModel, SequenceDocument};
+export {SequenceDBModel, SequenceDocument};
 
-export class SequenceSchema extends BaseSchema<SequenceModel> {
+export class SequenceSchema extends BaseSchema<SequenceDBModel> {
     constructor() {
         const schema: Object =
             {
@@ -20,7 +20,7 @@ export class SequenceSchema extends BaseSchema<SequenceModel> {
     }
 
     public getModelType() {
-        return SequenceModel;
+        return SequenceDBModel;
     }
 }
 

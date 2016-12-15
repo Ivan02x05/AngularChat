@@ -1,16 +1,14 @@
-/// <reference path="../../../../typings/tsd.d.ts"/>
-
 import {Schema}  from "mongoose";
 
 import BaseSchema from "./base.schema";
-import {ChatViewedNoModel, ChatViewedNoDocument} from "../models/chat.viewedno.model";
+import {ChatViewedNoDBModel, ChatViewedNoDocument} from "../models/chat.viewedno.db.model";
 import {DataBaseConstant} from "../../common/constants/database.constant";
 import ChatSchema from "./chat.schema";
 import UserSchema from "./user.schema";
 
-export {ChatViewedNoModel, ChatViewedNoDocument};
+export {ChatViewedNoDBModel, ChatViewedNoDocument};
 
-export class ChatViewedNoSchema extends BaseSchema<ChatViewedNoModel> {
+export class ChatViewedNoSchema extends BaseSchema<ChatViewedNoDBModel> {
     constructor() {
         const schema: Object =
             {
@@ -38,7 +36,7 @@ export class ChatViewedNoSchema extends BaseSchema<ChatViewedNoModel> {
     }
 
     public getModelType() {
-        return ChatViewedNoModel;
+        return ChatViewedNoDBModel;
     }
 }
 

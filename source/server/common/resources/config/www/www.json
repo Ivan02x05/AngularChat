@@ -6,9 +6,17 @@
     "updateSession": 60,
     "saveViewd": 60
   },
+  "redis": {
+     "host": "localhost",
+     "port": 6379,
+     "prefix": "sid:"
+  },
   "material": {
-      "chat": {
-          "path": "materials/chat"
-      }
+     "chat": {
+        "path": "materials/chat"
+     }
+  },
+  "scaleout": {
+    "timeout": 2
   }
 }

@@ -1,11 +1,9 @@
-/// <reference path="../../../typings/tsd.d.ts"/>
-
 import * as Q from "q";
 
 import BaseBusiness from "./common/base.business";
 import ChatMessageSchema from "../database/schemas/chat.message.schema";
-import {default as ChatMessagesModel, ChatMessageModel, ChatMessageDataModel}
-from "../../common/models/impl/chat/chat.message.model";
+import {default as ChatMessagesIOModel, ChatMessageIOModel, ChatMessageDataIOModel}
+from "../../common/models/io/chat/chat.message.io.model";
 
 import SessionManerger from "../common/manergers/session.manerger";
 import DivisionManerger from "../common/manergers/division.manerger";
@@ -17,22 +15,22 @@ var config = require("../common/resources/config/database/database.json");
 
 class ChatMessageBusiness extends BaseBusiness {
 
-    public findById(id: any, fields?: Object): Q.Promise<ChatMessagesModel> {
+    public findById(id: any, fields?: Object): Q.Promise<ChatMessagesIOModel> {
         return this.database.model(ChatMessageSchema)
             .findById(id, fields)
-            .then(result => new ChatMessagesModel(result))
+            .then(result => new ChatMessagesIOModel(result))
             .then(result => {
                 result.messages = result.messages.reverse();
                 return result;
             });
     }
 
-    public findByIdSelectId(id: any): Q.Promise<ChatMessagesModel> {
+    public findByIdSelectId(id: any): Q.Promise<ChatMessagesIOModel> {
         return this.findById(id, "_id messages._id");
     }
 
     public findByIdSelectMessages(cond: { id: any, count?: number, skip?: number, date?: Date }):
-        Q.Promise<{ _id: any, messages: ChatMessageModel[] }> {
+        Q.Promise<{ _id: any, messages: ChatMessageIOModel[] }> {
 
         var messages = this.database.model(ChatMessageSchema);
         var pipeline: any =
@@ -120,7 +118,7 @@ class ChatMessageBusiness extends BaseBusiness {
             .then(result => {
                 return {
                     _id: result._id,
-                    messages: result.messages.map(_ => new ChatMessageModel(_))
+                    messages: result.messages.map(_ => new ChatMessageIOModel(_))
                 }
             });
     }
@@ -179,7 +177,7 @@ class ChatMessageBusiness extends BaseBusiness {
             });
     }
 
-    public findByIdMessageSearch(cond: { id: any, condition: string }): Q.Promise<{ _id: any, messages: ChatMessageModel[] }> {
+    public findByIdMessageSearch(cond: { id: any, condition: string }): Q.Promise<{ _id: any, messages: ChatMessageIOModel[] }> {
 
         var messages = this.database.model(ChatMessageSchema);
         const condition = new RegExp(regexp.escape(cond.condition), "i");
@@ -238,12 +236,12 @@ class ChatMessageBusiness extends BaseBusiness {
             .then(result => {
                 return {
                     _id: result._id,
-                    messages: result.messages.map(_ => new ChatMessageModel(_))
+                    messages: result.messages.map(_ => new ChatMessageIOModel(_))
                 }
             });
     }
 
-    public findByIdSelectTextMessages(id: any): Q.Promise<{ _id: any, messages: ChatMessageModel[] }> {
+    public findByIdSelectTextMessages(id: any): Q.Promise<{ _id: any, messages: ChatMessageIOModel[] }> {
         var messages = this.database.model(ChatMessageSchema);
         var pipeline: any =
             [
@@ -306,12 +304,12 @@ class ChatMessageBusiness extends BaseBusiness {
             .then(result => {
                 return {
                     _id: result._id,
-                    messages: result.messages.map(_ => new ChatMessageModel(_))
+                    messages: result.messages.map(_ => new ChatMessageIOModel(_))
                 }
             });
     }
 
-    public regist(id: any): Q.Promise<ChatMessagesModel> {
+    public regist(id: any): Q.Promise<ChatMessagesIOModel> {
         var messages = this.database.model(ChatMessageSchema);
         var message = messages.toDocument({
             _id: null,
@@ -321,14 +319,14 @@ class ChatMessageBusiness extends BaseBusiness {
         message._id = id;
 
         return messages.save(message)
-            .then(result => new ChatMessagesModel(result));
+            .then(result => new ChatMessagesIOModel(result));
     }
 
-    public addMessage(id: any, message: ChatMessageModel):
-        Q.Promise<ChatMessageModel> {
+    public addMessage(id: any, message: ChatMessageIOModel):
+        Q.Promise<ChatMessageIOModel> {
 
         var messages = this.database.model(ChatMessageSchema);
-        var exec = (retry: number): Q.Promise<ChatMessageModel> => {
+        var exec = (retry: number): Q.Promise<ChatMessageIOModel> => {
             // modelのメソッド等が含まれるとエラーになるため、db用のオブジェクトに変換
             var dbobject = message.dbobject;
             dbobject._id = messages.id;
@@ -341,17 +339,13 @@ class ChatMessageBusiness extends BaseBusiness {
                 dbobject.message.data = dbobject._id + "." + dbobject.message.title.split(".")[1];
 
             return messages.findByIdAndUpdate({ _id: id }, { $push: { messages: dbobject } })
-                .then(() => new ChatMessageModel(dbobject))
-                .catch(_ => {
-                    if (retry <= config.retry.chat_message.count) {
-                        var deferred = Q.defer<void>();
-                        setTimeout(() => {
-                            deferred.resolve();
-                        }, config.retry.chat_message.second * 1000);
-                        return deferred.promise
+                .then(() => new ChatMessageIOModel(dbobject))
+                .catch<ChatMessageIOModel>(_ => {
+                    if (retry < config.retry.chat_message.count)
+                        return Q.delay(config.retry.chat_message.second * 1000)
                             .then(() => exec(retry + 1));
-                    }
-                    return Q.reject<ChatMessageModel>(_);
+                    else
+                        return Q.reject(_);
                 });
         };
 

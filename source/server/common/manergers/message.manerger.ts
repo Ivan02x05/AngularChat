@@ -1,44 +1,34 @@
-/// <reference path="../../../../typings/tsd.d.ts"/>
-
 import * as Q from "q";
 
-import MessageModel from "../../../common/models/impl/common/message.model";
+import MessageIOModel from "../../../common/models/io/common/message.io.model";
 import {lifecycle, LifeCycle, inject} from "../container/inject.decorator";
 import DataBase from "../../database/database";
 import MessageSchema from "../../database/schemas/message.schema";
 import Container from "../../common/container/container";
 
 @lifecycle(LifeCycle.Singleton)
-@inject([{ clazz: DataBase }])
 class MessageManerger {
-    private static deferred: Q.Deferred<void> = Q.defer<void>();
+    private _messages: Map<string, MessageIOModel> = new Map<string, MessageIOModel>();
 
-    private _messages: Map<string, MessageModel> = new Map<string, MessageModel>();
-
-    constructor(database?: DataBase) {
-        this.create(database);
+    public initialize(): Q.Promise<void> {
+        return this.create();
     }
 
-    private create(database: DataBase) {
-        database.model(MessageSchema)
+    @inject([{ clazz: DataBase }])
+    private create(database?: DataBase): Q.Promise<void> {
+        return database.model(MessageSchema)
             .find({ "systemColumn.deleteFlag": false })
             .then((data) => {
                 data.forEach(_ => {
-                    this.messages.set(_.code, new MessageModel(_));
+                    this.messages.set(_.code, new MessageIOModel(_));
                 })
-                MessageManerger.deferred.resolve();
-            });
+            })
     }
 
-    public static initialize(): Q.Promise<void> {
-        Container.regist(MessageManerger);
-        return MessageManerger.deferred.promise;
-    }
-
-    public getMessage(code: string, args?: string[]): MessageModel {
+    public getMessage(code: string, args?: string[]): MessageIOModel {
         if (this.messages.has(code)) {
             // clone
-            var message: MessageModel = <MessageModel>Object
+            var message: MessageIOModel = <MessageIOModel>Object
                 .assign({}, this.messages.get(code));
 
             if (args) {
@@ -53,7 +43,7 @@ class MessageManerger {
             return null;
     }
 
-    public get messages(): Map<string, MessageModel> {
+    public get messages(): Map<string, MessageIOModel> {
         return this._messages;
     }
 }

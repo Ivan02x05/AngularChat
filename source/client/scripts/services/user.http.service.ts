@@ -1,7 +1,7 @@
 import {Injectable} from  "angular2/core";
 
 import HttpService from "./common/http.service";
-import {UserModel, UserGetModel} from "../../../common/models/impl/common/user.model";
+import {UserIOModel, UserGetIOModel} from "../../../common/models/io/common/user.io.model";
 
 @Injectable()
 class UserService {
@@ -18,19 +18,19 @@ class UserService {
         return this.http.postJson("user/loginedlist");
     }
 
-    public getUser(model: UserGetModel) {
+    public getUser(model: UserGetIOModel) {
         return this.http.postJson("user/user", model);
     }
 
-    public regist(model: UserModel) {
+    public regist(model: UserIOModel) {
         return this.http.postJson("user/regist", model);
     }
 
-    public update(model: UserModel) {
+    public update(model: UserIOModel) {
         return this.http.postJson("user/update", model);
     }
 
-    public delete(model: UserModel) {
+    public delete(model: UserIOModel) {
         return this.http.postJson("user/delete", model);
     }
 }

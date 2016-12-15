@@ -1,15 +1,14 @@
 import * as Q from "q";
 
-import WWWBaseController from "../common/www.base.controller";
-import UserModel from "../../../../common/models/impl/common/user.model";
-import {controller, method} from "../common/controller.decorator";
+import {WwwBaseController, controller, method} from "../common/www.base.controller";
+import UserIOModel from "../../../../common/models/io/common/user.io.model";
 import MessageService from "../../../service/message.service";
 import ServiceResult from "../../../service/common/service.result";
 
-@controller
-class MessageController extends WWWBaseController {
+@controller()
+class MessageController extends WwwBaseController {
 
-    @method({ services: [MessageService] })
+    @method()
     public list(service?: MessageService): Q.Promise<void> {
         return service.getList()
             .then((result: ServiceResult) => {

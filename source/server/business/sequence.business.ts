@@ -1,11 +1,9 @@
-/// <reference path="../../../typings/tsd.d.ts"/>
-
 import * as Q from "q";
 
 import DataBase from "../database/database";
 import BaseBusiness from "./common/base.business";
 import SequenceSchema from "../database/schemas/sequence.schema";
-import SequenceModel from "../../common/models/impl/common/sequence.model";
+import SequenceIOModel from "../../common/models/io/common/sequence.io.model";
 
 class SequenceBusiness extends BaseBusiness {
     public next(name: string): Q.Promise<number> {

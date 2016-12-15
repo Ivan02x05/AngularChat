@@ -1,36 +1,36 @@
-import ErrorModel from "../../../common/models/impl/common/error.model";
+import ErrorIOModel from "../../../common/models/io/common/error.io.model";
 import {ErrorConstant} from "../../../common/constants/error.constant";
 import {Container} from "../../common/container/container";
 import MessageManerger from "../../common/manergers/message.manerger";
 
-export function required(value: any, name: string): ErrorModel {
+export function required(value: any, name: string): ErrorIOModel {
     if (value == null || value.length == 0)
         return createError(ErrorConstant.Code.Error.REQUIRED, name);
 }
 
-export function maxlength(value: any, length: number, name: string): ErrorModel {
+export function maxlength(value: any, length: number, name: string): ErrorIOModel {
     if (value != null && value.length > length)
         return createError(ErrorConstant.Code.Error.MAX_LENGTH, name, length.toString());
 }
 
-export function minlength(value: any, length: number, name: string): ErrorModel {
+export function minlength(value: any, length: number, name: string): ErrorIOModel {
     if (value != null && value.length < length)
         return createError(ErrorConstant.Code.Error.MIN_LENGTH, name, length.toString());
 }
 
-export function justlength(value: any, length: number, name: string): ErrorModel {
+export function justlength(value: any, length: number, name: string): ErrorIOModel {
     if (value != null && value.length != length)
         return createError(ErrorConstant.Code.Error.JUST_LENGTH, name, length.toString());
 }
 
-function createError(code: string, ...params: string[]): ErrorModel {
+function createError(code: string, ...params: string[]): ErrorIOModel {
     var manerger: MessageManerger = Container.resolve(MessageManerger);
     var message = manerger.getMessage(code, params);
-    return new ErrorModel(message.code, message.message, message.level)
+    return new ErrorIOModel(message.code, message.message, message.level)
 }
 
-export function configValidator(config: any, target: any): ErrorModel[] {
-    var errors: ErrorModel[] = [];
+export function configValidator(config: any, target: any): ErrorIOModel[] {
+    var errors: ErrorIOModel[] = [];
 
     if (!config)
         return null;
@@ -44,7 +44,7 @@ export function configValidator(config: any, target: any): ErrorModel[] {
     for (var c in config) {
         var validators = config[c].validators;
         for (var v in validators) {
-            var error: ErrorModel;
+            var error: ErrorIOModel;
             var value = null;
             var keys = c.split(".");
             if (target != null) {

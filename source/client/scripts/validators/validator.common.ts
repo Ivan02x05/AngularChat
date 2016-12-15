@@ -1,12 +1,12 @@
 import {Validator, NG_VALIDATORS, AbstractControl} from "angular2/common";
 import {Input} from "angular2/core";
 
-import ErrorModel from "../../../common/models/impl/common/error.model";
+import ErrorIOModel from "../../../common/models/io/common/error.io.model";
 export {ErrorConstant} from "../../../common/constants/error.constant";
 import InjectManerger from "../manergers/inject.manerger";
 import MessageManerger from "../manergers/message.manerger";
 
-export interface ValidatorResult { [key: string]: ErrorModel; }
+export interface ValidatorResult { [key: string]: ErrorIOModel; }
 
 export abstract class ValidatorBase implements Validator {
     @Input("control-name") protected controlName: string;
@@ -24,7 +24,7 @@ export abstract class ValidatorBase implements Validator {
     protected add(code: string, ...params: string[]) {
         var manerger: MessageManerger = InjectManerger.injector.get(MessageManerger);
         var message = manerger.getMessage(code, params);
-        this.result[code] = new ErrorModel(message.code,
+        this.result[code] = new ErrorIOModel(message.code,
             message.message, message.level);
     }
 

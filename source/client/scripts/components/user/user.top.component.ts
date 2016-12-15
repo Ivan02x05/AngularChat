@@ -3,12 +3,12 @@ import {CanActivate} from  "angular2/router";
 
 import {default as FormComponent, FORM_DIRECTIVES} from "../common/form.component";
 import UserService from "../../services/user.http.service";
-import UserModel from "../../../../common/models/impl/common/user.model";
-import UserInfoModelOrg from "../../../../common/models/impl/common/user.info.model";
+import UserIOModel from "../../../../common/models/io/common/user.io.model";
+import UserInfoIOModelOrg from "../../../../common/models/io/common/user.info.io.model";
 import UserManerger from "../../manergers/user.manerger";
 import {default as UserEditComponent, Mode} from "./user.edit.component";
 
-class UserInfoModel extends UserInfoModelOrg {
+class UserInfoIOModel extends UserInfoIOModelOrg {
     public active: boolean = false;
 }
 
@@ -17,7 +17,7 @@ class UserInfoModel extends UserInfoModelOrg {
     pure: false
 })
 class UserFilterPipe implements PipeTransform {
-    public transform(users: UserInfoModel[], filters: string[]) {
+    public transform(users: UserInfoIOModel[], filters: string[]) {
         if (filters.length == 0
             || filters[0] == null)
             return users;
@@ -39,10 +39,10 @@ class UserFilterPipe implements PipeTransform {
 @CanActivate((next, prev) => UserManerger.authenticated)
 class UserTopComponent implements OnInit {
     private service: UserService;
-    private users: UserInfoModel[] = [];
+    private users: UserInfoIOModel[] = [];
     private target: string;
     private filter: string;
-    private user: UserModel;
+    private user: UserIOModel;
 
     constructor(service: UserService, manerger: UserManerger) {
         this.service = service;
@@ -57,7 +57,7 @@ class UserTopComponent implements OnInit {
         this.service.loginedlist()
             .subscribe((model) => {
                 this.users = model.models.users
-                    .map(_ => new UserInfoModel(_));
+                    .map(_ => new UserInfoIOModel(_));
                 this.target = this.user._id;
                 this.users.filter(_ => _._id == this.target)[0].active = true;
                 this.resort();
@@ -69,7 +69,7 @@ class UserTopComponent implements OnInit {
         this.target = null;
     }
 
-    private select(user: UserInfoModel) {
+    private select(user: UserInfoIOModel) {
         this.clearActive();
         user.active = true;
         this.target = user._id;
@@ -82,8 +82,8 @@ class UserTopComponent implements OnInit {
             });
     }
 
-    private onChange(info: { mode: Mode, model: UserModel }) {
-        var model = new UserInfoModel(info.model);
+    private onChange(info: { mode: Mode, model: UserIOModel }) {
+        var model = new UserInfoIOModel(info.model);
         model.active = true;
 
         switch (info.mode) {

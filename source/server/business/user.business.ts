@@ -1,20 +1,18 @@
-/// <reference path="../../../typings/tsd.d.ts"/>
-
 import * as Q from "q";
 
 import BaseBusiness from "./common/base.business";
 import UserSchema from "../database/schemas/user.schema";
-import UserModel from "../../common/models/impl/common/user.model";
+import UserIOModel from "../../common/models/io/common/user.io.model";
 import * as security from "../common/utils/security.util";
 import DivisionManerger from "../common/manergers/division.manerger";
 import {CodeConstant} from "../../common/constants/code.constant";
 
 class UserBusiness extends BaseBusiness {
 
-    public getList(): Q.Promise<UserModel[]> {
+    public getList(): Q.Promise<UserIOModel[]> {
         return this.database.model(UserSchema)
             .find({ "systemColumn.deleteFlag": false })
-            .then(result => result.map(_ => new UserModel(_)))
+            .then(result => result.map(_ => new UserIOModel(_)))
             .then(result => {
                 result.forEach(_ => {
                     _.password = security.decryption(_.password);
@@ -24,7 +22,7 @@ class UserBusiness extends BaseBusiness {
             });
     }
 
-    public findById(id: any): Q.Promise<UserModel> {
+    public findById(id: any): Q.Promise<UserIOModel> {
         return this.database.model(UserSchema)
             .findById(id)
             .then(result => {
@@ -33,21 +31,21 @@ class UserBusiness extends BaseBusiness {
                 else
                     return null;
             })
-            .then(result => new UserModel(result))
+            .then(result => new UserIOModel(result))
             .then(result => {
                 result.password = security.decryption(result.password);
                 return result;
             });
     }
 
-    public findByUserId(userId: string): Q.Promise<UserModel> {
+    public findByUserId(userId: string): Q.Promise<UserIOModel> {
         return this.database.model(UserSchema)
             .find({ userId: userId, "systemColumn.deleteFlag": false })
             .then(result => {
                 if (!result || result.length == 0)
                     return null
                 else {
-                    var user = new UserModel(result[0]);
+                    var user = new UserIOModel(result[0]);
                     user.password = security.decryption(user.password);
                     return user;
                 }
@@ -64,20 +62,20 @@ class UserBusiness extends BaseBusiness {
             .then(result => result.length);
     }
 
-    public regist(model: UserModel): Q.Promise<UserModel> {
+    public regist(model: UserIOModel): Q.Promise<UserIOModel> {
         var users = this.database.model(UserSchema);
         var user = users.toDocument(model);
         user.password = security.encryption(user.password);
 
         return users.save(user)
-            .then(result => new UserModel(result))
+            .then(result => new UserIOModel(result))
             .then(result => {
                 result.password = security.decryption(result.password);
                 return result
             });
     }
 
-    public update(model: UserModel): Q.Promise<UserModel> {
+    public update(model: UserIOModel): Q.Promise<UserIOModel> {
         var users = this.database.model(UserSchema);
         var division = this.getComponent(DivisionManerger);
 
@@ -93,16 +91,16 @@ class UserBusiness extends BaseBusiness {
 
                 return users.save(_);
             })
-            .then(result => new UserModel(result))
+            .then(result => new UserIOModel(result))
             .then(result => {
                 result.password = security.decryption(result.password);
                 return result
             });
     }
 
-    public delete(model: UserModel): Q.Promise<UserModel> {
+    public delete(model: UserIOModel): Q.Promise<UserIOModel> {
         return this.database.model(UserSchema).delete(model)
-            .then(result => new UserModel(result))
+            .then(result => new UserIOModel(result))
             .then(result => {
                 result.password = security.decryption(result.password);
                 return result

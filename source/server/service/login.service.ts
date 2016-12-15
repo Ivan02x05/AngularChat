@@ -1,11 +1,9 @@
-/// <reference path="../../../typings/tsd.d.ts"/>
-
 import * as Q from "q";
 
 import BaseService from "./common/base.service";
 import ServideResult from "./common/service.result";
 import {service, method} from "./common/service.decorator";
-import UserModel from "../../common/models/impl/common/user.model";
+import UserIOModel from "../../common/models/io/common/user.io.model";
 import UserBusiness from "../business/user.business";
 import Exception from "../common/exceptions/exception";
 import {ErrorConstant} from "../../common/constants/error.constant";
@@ -14,7 +12,7 @@ import {ErrorConstant} from "../../common/constants/error.constant";
 class LoginService extends BaseService {
 
     @method()
-    public login(model: UserModel): Q.Promise<any> {
+    public login(model: UserIOModel): Q.Promise<any> {
         var result = this.result;
         var business = this.getComponent(UserBusiness);
 

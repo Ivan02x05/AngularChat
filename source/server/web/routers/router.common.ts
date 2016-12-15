@@ -1,8 +1,6 @@
-/// <reference path="../../../../typings/tsd.d.ts"/>
-
 import * as express from "express";
 
-import WWWBaseController from "../controllers/common/www.base.controller";
+import WwwBaseController from "../controllers/common/www.base.controller";
 import {Container} from "../../common/container/container";
 
 export function execute(req: express.Request, res: express.Response, next: Function, namespace: string = "www") {
@@ -10,8 +8,11 @@ export function execute(req: express.Request, res: express.Response, next: Funct
     if (namespace.substring(namespace.length - 1) != "/")
         namespace += "/";
 
-    var type: WWWBaseController = require("../controllers/" + namespace + target + ".controller").default;
-    var instance: WWWBaseController = Container.resolve(type, req, [req, res]);
+    // regist request/response for Container
+    var container = new Container(req);
+    container.registInstance(res);
+    var type: WwwBaseController = require("../controllers/" + namespace + target + ".controller").default;
+    var instance: WwwBaseController = container.resolve(type);
 
     instance.exec()
         .catch((error: Error) => {

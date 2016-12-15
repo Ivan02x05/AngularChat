@@ -1,9 +1,10 @@
 import {Injectable} from  "angular2/core";
 
 import SocketService from "./common/socket.service";
-import {ChatModel, ChatJoinModel} from "../../../common/models/impl/chat/chat.model";
-import {ChatMessagesModel, ChatMessageModel, ChatMessageDataModel,
-    ChatAddMessageModel, ChatGetMessageListModel, ChatSearchMessagesModel} from "../../../common/models/impl/chat/chat.message.model";
+import {ChatIOModel, ChatJoinIOModel} from "../../../common/models/io/chat/chat.io.model";
+import {ChatMessagesIOModel, ChatMessageIOModel, ChatMessageDataIOModel,
+    ChatAddMessageIOModel, ChatGetMessageListIOModel, ChatSearchMessagesIOModel}
+from "../../../common/models/io/chat/chat.message.io.model";
 
 @Injectable()
 class ChatService extends SocketService {
@@ -12,75 +13,75 @@ class ChatService extends SocketService {
         this.initialize("chat");
     }
 
-    public set onChatList(cb: (models: ChatModel[]) => void) {
+    public set onChatList(cb: (models: ChatIOModel[]) => void) {
         this.on("chatlist", (response) => {
             cb(response.models.chats
-                .map(_ => new ChatModel(_)));
+                .map(_ => new ChatIOModel(_)));
         });
     }
 
-    public set onRegist(cb: (model: ChatModel) => void) {
+    public set onRegist(cb: (model: ChatIOModel) => void) {
         this.on("regist", (response) => {
-            cb(new ChatModel(response.models.chat));
+            cb(new ChatIOModel(response.models.chat));
         });
     }
 
-    public set onRegisted(cb: (model: ChatModel) => void) {
+    public set onRegisted(cb: (model: ChatIOModel) => void) {
         this.on("regist", (response) => {
             if (response.models.fromself)
-                cb(new ChatModel(response.models.chat));
+                cb(new ChatIOModel(response.models.chat));
         });
     }
 
-    public set onUpdate(cb: (model: ChatModel) => void) {
+    public set onUpdate(cb: (model: ChatIOModel) => void) {
         this.on("update", (response) => {
-            cb(new ChatModel(response.models.chat));
+            cb(new ChatIOModel(response.models.chat));
         });
     }
 
-    public set onUpdated(cb: (model: ChatModel) => void) {
+    public set onUpdated(cb: (model: ChatIOModel) => void) {
         this.on("update", (response) => {
             if (response.models.fromself)
-                cb(new ChatModel(response.models.chat));
+                cb(new ChatIOModel(response.models.chat));
         }, cb);
     }
 
-    public set onDelete(cb: (model: ChatModel) => void) {
+    public set onDelete(cb: (model: ChatIOModel) => void) {
         this.on("delete", (response) => {
-            cb(new ChatModel(response.models.chat));
+            cb(new ChatIOModel(response.models.chat));
         });
     }
 
-    public set onAddMessage(cb: (chat: ChatModel, message: ChatMessageModel) => void) {
+    public set onAddMessage(cb: (chat: ChatIOModel, message: ChatMessageIOModel) => void) {
         this.on("addmessage", (response) => {
-            cb(new ChatModel(response.models.chat),
-                new ChatMessageModel(response.models.message));
+            cb(new ChatIOModel(response.models.chat),
+                new ChatMessageIOModel(response.models.message));
         }, cb);
     }
 
-    public set onJoin(cb: (chat: ChatModel, messages: ChatMessagesModel) => void) {
+    public set onJoin(cb: (chat: ChatIOModel, messages: ChatMessagesIOModel) => void) {
         this.on("join", (response) => {
-            cb(new ChatModel(response.models.chat),
-                new ChatMessagesModel(response.models.messages));
+            cb(new ChatIOModel(response.models.chat),
+                new ChatMessagesIOModel(response.models.messages));
         }, cb);
     }
 
-    public set onMessageList(cb: (model: ChatMessagesModel) => void) {
+    public set onMessageList(cb: (model: ChatMessagesIOModel) => void) {
         this.on("messagelist", (response) => {
-            cb(new ChatMessagesModel(response.models.messages));
+            cb(new ChatMessagesIOModel(response.models.messages));
         }, cb);
     }
 
-    public set onMessageDailyList(cb: (model: ChatMessagesModel[]) => void) {
+    public set onMessageDailyList(cb: (model: ChatMessagesIOModel[]) => void) {
         this.on("messagedailylist", (response) => {
             cb(response.models.daily
-                .map(_ => new ChatMessagesModel(_)));
+                .map(_ => new ChatMessagesIOModel(_)));
         }, cb);
     }
 
-    public set onDownload(cb: (model: ChatMessagesModel) => void) {
+    public set onDownload(cb: (model: ChatMessagesIOModel) => void) {
         this.on("download", (response) => {
-            cb(new ChatMessagesModel(response.models.messages));
+            cb(new ChatMessagesIOModel(response.models.messages));
         }, cb);
     }
 
@@ -88,43 +89,43 @@ class ChatService extends SocketService {
         this.emit("chatlist");
     }
 
-    public join(model: ChatJoinModel) {
+    public join(model: ChatJoinIOModel) {
         this.emit("join", model);
     }
 
-    public exit(model: ChatJoinModel) {
+    public exit(model: ChatJoinIOModel) {
         this.emit("exit", model);
     }
 
-    public regist(model: ChatModel) {
+    public regist(model: ChatIOModel) {
         this.emit("regist", model);
     }
 
-    public update(model: ChatModel) {
+    public update(model: ChatIOModel) {
         this.emit("update", model);
     }
 
-    public delete(model: ChatModel) {
+    public delete(model: ChatIOModel) {
         this.emit("delete", model);
     }
 
-    public addMessage(model: ChatAddMessageModel) {
+    public addMessage(model: ChatAddMessageIOModel) {
         this.emit("addmessage", model);
     }
 
-    public getMessageList(model: ChatGetMessageListModel) {
+    public getMessageList(model: ChatGetMessageListIOModel) {
         this.emit("messagelist", model);
     }
 
-    public getMessageDailyList(model: ChatJoinModel) {
+    public getMessageDailyList(model: ChatJoinIOModel) {
         this.emit("messagedailylist", model);
     }
 
-    public search(model: ChatSearchMessagesModel) {
+    public search(model: ChatSearchMessagesIOModel) {
         this.emit("search", model);
     }
 
-    public download(model: ChatJoinModel) {
+    public download(model: ChatJoinIOModel) {
         this.emit("download", model);
     }
 }

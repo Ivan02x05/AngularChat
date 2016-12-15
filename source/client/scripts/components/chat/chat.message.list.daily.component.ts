@@ -1,8 +1,10 @@
 import {Component, provide} from  "angular2/core";
 
 import ChatService from "../../services/chat.socket.service";
-import {ChatModel, ChatJoinModel} from "../../../../common/models/impl/chat/chat.model";
-import {ChatMessagesModel, ChatMessageModel, ChatGetMessageListModel} from "../../../../common/models/impl/chat/chat.message.model";
+import {ChatIOModel, ChatJoinIOModel} from "../../../../common/models/io/chat/chat.io.model";
+import {ChatMessagesIOModel, ChatMessageIOModel, ChatGetMessageListIOModel}
+from "../../../../common/models/io/chat/chat.message.io.model";
+
 import ChatMessageListAbstractComponent from "./chat.message.list.abstract.component";
 import ChatMessageListComponent from "./chat.message.list.component";
 import * as dateutil from "../../../../common/utils/date.util";
@@ -13,7 +15,7 @@ import * as dateutil from "../../../../common/utils/date.util";
     templateUrl: "scripts/components/chat/chat.message.list.daily.html"
 })
 class ChatMessageListDailyComponent extends ChatMessageListAbstractComponent {
-    private dailymessages: ChatMessagesModel[] = [];
+    private dailymessages: ChatMessagesIOModel[] = [];
 
     constructor(service: ChatService) {
         super(service);
@@ -22,7 +24,7 @@ class ChatMessageListDailyComponent extends ChatMessageListAbstractComponent {
     public ngOnInit() {
         super.ngOnInit();
 
-        this.service.getMessageDailyList(new ChatJoinModel(
+        this.service.getMessageDailyList(new ChatJoinIOModel(
             {
                 code: this.chat.code
             }
@@ -67,11 +69,11 @@ class ChatMessageListDailyComponent extends ChatMessageListAbstractComponent {
         this.service.onMessageList = this.chatEvents[index + 1];
     }
 
-    protected onAddMessage(chat: ChatModel, message: ChatMessageModel): boolean {
+    protected onAddMessage(chat: ChatIOModel, message: ChatMessageIOModel): boolean {
         if (super.onAddMessage(chat, message)) {
             if (this.dailymessages.length == 0
                 || !dateutil.equals(this.dailymessages[0].date, dateutil.toYyyymmdd(message.time)))
-                this.dailymessages.unshift(new ChatMessagesModel(
+                this.dailymessages.unshift(new ChatMessagesIOModel(
                     {
                         _id: this.chat._id,
                         messages: [],
@@ -84,7 +86,7 @@ class ChatMessageListDailyComponent extends ChatMessageListAbstractComponent {
             return false;
     }
 
-    public onMessageDailyList(daily: ChatMessagesModel[]) {
+    public onMessageDailyList(daily: ChatMessagesIOModel[]) {
         var count = 0;
         this.dailymessages = daily;
         for (var day of this.dailymessages) {
@@ -103,9 +105,9 @@ class ChatMessageListDailyComponent extends ChatMessageListAbstractComponent {
         }
     }
 
-    public getMessageList(model: ChatMessagesModel) {
+    public getMessageList(model: ChatMessagesIOModel) {
         this.connecting = true;
-        this.service.getMessageList(new ChatGetMessageListModel(
+        this.service.getMessageList(new ChatGetMessageListIOModel(
             {
                 _id: model._id,
                 date: model.date,
@@ -114,7 +116,7 @@ class ChatMessageListDailyComponent extends ChatMessageListAbstractComponent {
         ));
     }
 
-    public onMessageList(messages: ChatMessagesModel) {
+    public onMessageList(messages: ChatMessagesIOModel) {
         this.connecting = false;
 
         var day = this.dailymessages.filter(_ => dateutil.equals(_.date, dateutil
@@ -125,8 +127,8 @@ class ChatMessageListDailyComponent extends ChatMessageListAbstractComponent {
         day.unshown = messages.unshown;
     }
 
-    public getMessagesList(): ChatMessageModel[] {
-        var messages: ChatMessageModel[] = [];
+    public getMessagesList(): ChatMessageIOModel[] {
+        var messages: ChatMessageIOModel[] = [];
         this.dailymessages.forEach(d => {
             d.messages.forEach(m => {
                 messages.push(m);

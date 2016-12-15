@@ -1,12 +1,10 @@
-/// <reference path="../../../typings/tsd.d.ts"/>
-
 import * as Q from "q";
 
 import BaseService from "./common/base.service";
 import ServideResult from "./common/service.result";
 import {service, method} from "./common/service.decorator";
 import MessageManerger from "../common/manergers/message.manerger";
-import MessageModel from "../../common/models/impl/common/message.model";
+import MessageIOModel from "../../common/models/io/common/message.io.model";
 
 @service
 class MessageService extends BaseService {
@@ -19,7 +17,7 @@ class MessageService extends BaseService {
                 .getComponent(MessageManerger);
 
             // convert
-            var messages: MessageModel[] = [];
+            var messages: MessageIOModel[] = [];
             manerger.messages.forEach((v, k) => {
                 messages.push(v);
             });

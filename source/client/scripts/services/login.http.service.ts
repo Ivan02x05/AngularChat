@@ -1,7 +1,7 @@
 import {Injectable} from  "angular2/core";
 
 import HttpService from "./common/http.service";
-import UserModel from "../../../common/models/impl/common/user.model";
+import UserIOModel from "../../../common/models/io/common/user.io.model";
 
 @Injectable()
 class LoginService {
@@ -10,7 +10,7 @@ class LoginService {
         this.http = http;
     }
 
-    public login(model: UserModel) {
+    public login(model: UserIOModel) {
         return this.http.postJson("login/login", model);
     }
 }

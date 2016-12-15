@@ -1,12 +1,10 @@
-/// <reference path="../../../../typings/tsd.d.ts"/>
-
 import {Document}  from "mongoose";
-import IBaseModel from "../../../common/models/common/base.model.interface";
+import IBaseModel from "../../../common/models/if/common/base.model.interface";
 import DataBase from "../database";
-import BaseModel from "../models/base.model";
+import BaseDBModel from "../models/base.db.model";
 
 interface BaseDocument extends IBaseModel, Document {
-    creator: BaseModel<BaseDocument>;
+    dbmodel: BaseDBModel<BaseDocument>;
 }
 
 export default BaseDocument;

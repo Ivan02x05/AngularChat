@@ -1,4 +1,4 @@
-import ISequenceModel from "../../../common/models/common/sequence.model.interface";
+import ISequenceModel from "../../../common/models/if/common/sequence.model.interface";
 import BaseDocument from "./base.document";
 
 interface SequenceDocument extends ISequenceModel, BaseDocument {

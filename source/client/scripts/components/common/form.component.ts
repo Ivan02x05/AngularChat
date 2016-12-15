@@ -1,9 +1,9 @@
 import {EventEmitter} from "angular2/core";
 import {FORM_DIRECTIVES as ORG_FORM_DIRECTIVES, NgForm} from "angular2/common";
 
-import UserModel from "../../../../common/models/impl/common/user.model";
-import MessageModel from "../../../../common/models/impl/common/message.model";
-import ErrorModel from "../../../../common/models/impl/common/error.model";
+import UserIOModel from "../../../../common/models/io/common/user.io.model";
+import MessageIOModel from "../../../../common/models/io/common/message.io.model";
+import ErrorIOModel from "../../../../common/models/io/common/error.io.model";
 import InjectManerger from "../../manergers/inject.manerger";
 import MessageManerger from "../../manergers/message.manerger";
 import * as ValidatorCommon from "../../validators/validator.common";
@@ -12,10 +12,10 @@ import UserManerger from "../../manergers/user.manerger";
 
 abstract class FormComponent {
     public form: NgForm;
-    public errorChanges: EventEmitter<ErrorModel[]> = new EventEmitter<ErrorModel[]>();
+    public errorChanges: EventEmitter<ErrorIOModel[]> = new EventEmitter<ErrorIOModel[]>();
 
-    protected user: UserModel;
-    protected errors: ErrorModel[] = [];
+    protected user: UserIOModel;
+    protected errors: ErrorIOModel[] = [];
 
     constructor() {
         this.user = UserManerger.instanse.user;
@@ -25,7 +25,7 @@ abstract class FormComponent {
         return InjectManerger.injector.get(MessageManerger);
     }
 
-    protected getMessage(code: string, args?: string[]): MessageModel {
+    protected getMessage(code: string, args?: string[]): MessageIOModel {
         return this.messageMgr.getMessage(code, args);
     }
 
@@ -33,15 +33,15 @@ abstract class FormComponent {
         return this.errors.length != 0;
     }
 
-    protected addError(value: string | ErrorModel | ErrorModel[], ...params: string[]) {
+    protected addError(value: string | ErrorIOModel | ErrorIOModel[], ...params: string[]) {
         if (Array.isArray(value)) {
-            for (var e of <ErrorModel[]>value)
+            for (var e of <ErrorIOModel[]>value)
                 this.errors.push(e);
-        } else if (value instanceof ErrorModel) {
-            this.errors.push(<ErrorModel>value);
+        } else if (value instanceof ErrorIOModel) {
+            this.errors.push(<ErrorIOModel>value);
         } else {
             var message = this.getMessage(<string>value, params);
-            this.errors.push(new ErrorModel(message.code,
+            this.errors.push(new ErrorIOModel(message.code,
                 message.message, message.level));
         }
         this.emitErrorChanges();

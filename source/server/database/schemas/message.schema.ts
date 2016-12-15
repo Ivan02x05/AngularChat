@@ -1,12 +1,12 @@
 import BaseSchema from "./base.schema";
-import {MessageModel, MessageDocument} from "../models/message.model";
+import {MessageDBModel, MessageDocument} from "../models/message.db.model";
 import {getValues} from "../../../common/utils/enum.util";
 import {ErrorConstant} from "../../../common/constants/error.constant";
 import {DataBaseConstant} from "../../common/constants/database.constant";
 
-export {MessageModel, MessageDocument};
+export {MessageDBModel, MessageDocument};
 
-export class MessageSchema extends BaseSchema<MessageModel> {
+export class MessageSchema extends BaseSchema<MessageDBModel> {
     constructor() {
         const level = getValues(ErrorConstant.ErrorLevel);
         const schema: Object =
@@ -16,7 +16,8 @@ export class MessageSchema extends BaseSchema<MessageModel> {
                 level: { type: Number, required: true, enum: level }
             };
 
-        super(schema);
+        // 排他エラー時にメッセージを設定するため、nosystem:trueを設定する
+        super(schema, { nosystem: true });
     }
 
     public getCollectionName() {
@@ -24,7 +25,7 @@ export class MessageSchema extends BaseSchema<MessageModel> {
     }
 
     public getModelType() {
-        return MessageModel;
+        return MessageDBModel;
     }
 }
 

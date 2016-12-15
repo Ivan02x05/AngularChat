@@ -2,9 +2,9 @@ import {Schema}  from "mongoose";
 
 import BaseSchema from "./base.schema";
 import UserSchema from "./user.schema";
-import {BaseModel, BaseDocument} from "../models/base.model";
+import {BaseDBModel, BaseDocument} from "../models/base.db.model";
 
-export class UserInfoSchema extends BaseSchema<BaseModel<BaseDocument>> {
+export class UserInfoSchema extends BaseSchema<BaseDBModel<BaseDocument>> {
     constructor() {
         const userSchema = BaseSchema.getSchema(UserSchema);
         const schema: Object =

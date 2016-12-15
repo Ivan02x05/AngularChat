@@ -1,13 +1,13 @@
 import {Injectable} from  "angular2/core";
 import {Observable, Observer} from "rxjs/Rx";
 
-import UserModel from "../../../common/models/impl/common/user.model";
+import UserIOModel from "../../../common/models/io/common/user.io.model";
 import TopService from "../services/top.socket.service";
 import InjectManerger from "./inject.manerger";
 
 @Injectable()
 class UserManerger {
-    public user: UserModel;
+    public user: UserIOModel;
     private service: TopService;
     private observer: Observer<void>;
 
@@ -15,7 +15,7 @@ class UserManerger {
         this.service = service;
     }
 
-    public initialize(user: UserModel) {
+    public initialize(user: UserIOModel) {
         this.user = user;
         this.initService();
     }
@@ -45,7 +45,7 @@ class UserManerger {
         this.observer.complete();
     }
 
-    private onUpdate(user: UserModel) {
+    private onUpdate(user: UserIOModel) {
         this.user = user;
     }
 

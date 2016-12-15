@@ -65,7 +65,7 @@
   },
   "scripts": {
     "debug": "call cmds/debug",
-    "run": "node bin/server/web/app.js",
+    "run": "set NODE_CLUSTER=1&&node bin/server/web/app.js",
     "rebuild": "grunt rebuild",
     "release": "grunt release",
     "watch": "grunt watch",

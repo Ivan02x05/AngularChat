@@ -1,42 +1,42 @@
-import ErrorModel from "../models/impl/common/error.model";
-import MessageModel from "../models/impl/common/message.model";
+import ErrorIOModel from "../models/io/common/error.io.model";
+import MessageIOModel from "../models/io/common/message.io.model";
 import {ErrorConstant} from "../constants/error.constant";
 
 abstract class AbstractException extends Error {
-    public errors: ErrorModel[];
+    public errors: ErrorIOModel[];
     public exception: any;
 
-    constructor(value: string | ErrorModel | ErrorModel[], params?: string[], exception?: any) {
+    constructor(value: string | ErrorIOModel | ErrorIOModel[], params?: string[], exception?: any) {
         super();
         this.addError(value, params);
         this.exception = exception;
     }
 
-    protected abstract getManerger(): { getMessage: (code: string, args?: string[]) => MessageModel };
+    protected abstract getManerger(): { getMessage: (code: string, args?: string[]) => MessageIOModel };
 
-    private createError(value: string, params?: string[]): ErrorModel {
-        var error: ErrorModel;
+    private createError(value: string, params?: string[]): ErrorIOModel {
+        var error: ErrorIOModel;
         try {
             // MessageManerger作成で失敗した場合、エラーを発生させない
-            var model: MessageModel = this.getManerger().getMessage(value, params);
-            error = new ErrorModel(model.code, model.message, model.level);
+            var model: MessageIOModel = this.getManerger().getMessage(value, params);
+            error = new ErrorIOModel(model.code, model.message, model.level);
         } catch (error) {
-            error = new ErrorModel(ErrorConstant.Code.Fatal.UN_DEFINED,
+            error = new ErrorIOModel(ErrorConstant.Code.Fatal.UN_DEFINED,
                 "未定義のエラーが発生しました。", ErrorConstant.ErrorLevel.Fatal);
         }
 
         return error;
     }
 
-    public addError(value: string | ErrorModel | ErrorModel[], params?: string[]) {
+    public addError(value: string | ErrorIOModel | ErrorIOModel[], params?: string[]) {
         if (Array.isArray(value)) {
-            this.errors = <ErrorModel[]>value;
+            this.errors = <ErrorIOModel[]>value;
         } else {
             if (this.errors == null)
                 this.errors = [];
 
-            if (value instanceof ErrorModel) {
-                this.errors.push(<ErrorModel>value);
+            if (value instanceof ErrorIOModel) {
+                this.errors.push(<ErrorIOModel>value);
             } else {
                 this.errors.push(this.createError(<string>value, params));
             }

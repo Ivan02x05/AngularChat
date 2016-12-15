@@ -1,5 +1,3 @@
-/// <reference path="../../../../typings/tsd.d.ts"/>
-
 import * as Q from "q";
 
 import {Container, Cache} from "../../common/container/container";
@@ -30,14 +28,9 @@ export function method() {
         const original = descriptor.value;
 
         descriptor.value = function(...args: any[]) {
-            var params: any[] = [];
-            args.map((p) => {
-                if (p)
-                    params.push(p);
-            });
             // regist service result
             var result: ServideResult = Container.resolve(ServideResult, this, null, Cache.Prototype);
-            return original.apply(this, params)
+            return original.apply(this, args)
                 .then(() => result);
         };
         return descriptor;

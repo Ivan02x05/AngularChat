@@ -2,7 +2,7 @@ import {Directive, HostMetadata, OnInit, EventEmitter} from "angular2/core";
 import {NgForm} from "angular2/common";
 
 import FormComponent from "../components/common/form.component";
-import ErrorModel from "../../../common/models/impl/common/error.model";
+import ErrorIOModel from "../../../common/models/io/common/error.io.model";
 
 @Directive({
     selector: 'form',
@@ -15,7 +15,7 @@ class FormDirective implements OnInit {
     private ngForm: NgForm;
     private formCmp: FormComponent;
 
-    public errorChanges: EventEmitter<ErrorModel[]> = new EventEmitter<ErrorModel[]>();
+    public errorChanges: EventEmitter<ErrorIOModel[]> = new EventEmitter<ErrorIOModel[]>();
 
     constructor(ngForm: NgForm, formCmp: FormComponent) {
         this.ngForm = ngForm;

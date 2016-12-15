@@ -3,7 +3,7 @@ import {Component, Input, OnInit, OptionalMetadata} from "angular2/core";
 
 import {ValidatorResult} from "../../validators/validator.common";
 import FormGroupDirective from "../../directives/form-group.directive";
-import ErrorModel from "../../../../common/models/impl/common/error.model";
+import ErrorIOModel from "../../../../common/models/io/common/error.io.model";
 
 @Component({
     selector: "control-error",
@@ -12,7 +12,7 @@ import ErrorModel from "../../../../common/models/impl/common/error.model";
 @(<any>Reflect).metadata("parameters", [[new OptionalMetadata()]])
 class ControlErrorComponent implements OnInit {
     @Input("target") private control: NgControlName;
-    private error: ErrorModel;
+    private error: ErrorIOModel;
     private formGroup: FormGroupDirective;
 
     constructor(formGroup: FormGroupDirective) {

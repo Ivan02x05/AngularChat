@@ -1,8 +1,10 @@
 import {Component, provide} from  "angular2/core";
 
 import ChatService from "../../services/chat.socket.service";
-import ChatModel from "../../../../common/models/impl/chat/chat.model";
-import {ChatMessagesModel, ChatMessageModel, ChatSearchMessagesModel} from "../../../../common/models/impl/chat/chat.message.model";
+import ChatIOModel from "../../../../common/models/io/chat/chat.io.model";
+import {ChatMessagesIOModel, ChatMessageIOModel, ChatSearchMessagesIOModel}
+from "../../../../common/models/io/chat/chat.message.io.model";
+
 import ChatMessageListAbstractComponent from "./chat.message.list.abstract.component";
 import ChatMessageListComponent from "./chat.message.list.component";
 
@@ -12,7 +14,7 @@ import ChatMessageListComponent from "./chat.message.list.component";
     templateUrl: "scripts/components/chat/chat.message.list.search.html"
 })
 class ChatMessageListSearchComponent extends ChatMessageListAbstractComponent {
-    private search: ChatMessageModel[] = [];
+    private search: ChatMessageIOModel[] = [];
 
     constructor(service: ChatService) {
         super(service);
@@ -26,11 +28,11 @@ class ChatMessageListSearchComponent extends ChatMessageListAbstractComponent {
         this.service.onMessageList = this.chatEvents[index + 0];
     }
 
-    private onMessageList(messages: ChatMessagesModel) {
+    private onMessageList(messages: ChatMessagesIOModel) {
         this.search = messages.messages;
     }
 
-    public getMessagesList(): ChatMessageModel[] {
+    public getMessagesList(): ChatMessageIOModel[] {
         return this.search;
     }
 }

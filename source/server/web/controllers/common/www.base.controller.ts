@@ -1,17 +1,22 @@
-/// <reference path="../../../../../typings/tsd.d.ts"/>
-
 import * as express from "express";
 import * as Q from "q";
 import * as mime from "mime";
 
-import BaseController from "./base.controller";
-import BaseModel from "../../../../common/models/impl/common/base.model";
-import SessionModel from "../../../../common/models/impl/common/session.model";
-import ServiceResult from "../../../service/common/service.result";
-import ResponseModel from "../../../../common/models/impl/common/response.model";
-import * as fileutils from "../../../common/utils/file.util";
+var requestInject = require("express"),
+    request = requestInject.request.constructor,
+    response = requestInject.response.constructor;
 
-abstract class WWWBaseController extends BaseController {
+export * from "./base.controller";
+import {BaseController} from "./base.controller";
+import BaseIOModel from "../../../../common/models/io/common/base.io.model";
+import SessionIOModel from "../../../../common/models/io/common/session.io.model";
+import ServiceResult from "../../../service/common/service.result";
+import ResponseIOModel from "../../../../common/models/io/common/response.io.model";
+import * as fileutils from "../../../common/utils/file.util";
+import {inject} from "../../../common/container/inject.decorator";
+
+@inject([{ clazz: request }, { clazz: response }])
+export abstract class WwwBaseController extends BaseController {
     protected _req: express.Request;
     protected _res: express.Response;
 
@@ -23,31 +28,31 @@ abstract class WWWBaseController extends BaseController {
         return this._res;
     }
 
-    public get session(): SessionModel {
+    public get session(): SessionIOModel {
         return this.getSession();
     }
 
-    public getSession(): SessionModel {
-        return <SessionModel>(<any>this.request).session;
+    public getSession(): SessionIOModel {
+        return <SessionIOModel>(<any>this.request).session;
     }
 
-    constructor(req: express.Request, res: express.Response) {
+    constructor(req?: express.Request, res?: express.Response) {
         super();
 
         this._req = req;
         this._res = res;
     }
 
-    public exec(): Q.Promise<any> {
+    public exec(): Q.Promise<void> {
         return this.execMethod(this.request.params.method);
     }
 
-    protected json(result: ServiceResult | ResponseModel) {
-        var model: ResponseModel;
+    protected json(result: ServiceResult | ResponseIOModel) {
+        var model: ResponseIOModel;
         if (result instanceof ServiceResult)
-            model = this.resultToModel(<ServiceResult>result);
+            model = this.resultToIOModel(<ServiceResult>result);
         else
-            model = <ResponseModel>result;
+            model = <ResponseIOModel>result;
 
         this.response.json(model);
     }
@@ -61,4 +66,4 @@ abstract class WWWBaseController extends BaseController {
     }
 }
 
-export default WWWBaseController;
+export default WwwBaseController;

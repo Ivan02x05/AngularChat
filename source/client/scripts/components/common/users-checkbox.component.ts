@@ -2,7 +2,7 @@ import {Component, OnInit, provide, forwardRef, Pipe, PipeTransform} from  "angu
 import {ControlValueAccessor, NG_VALUE_ACCESSOR} from  "angular2/common";
 
 import UserService from "../../services/user.http.service";
-import UserInfoModel from "../../../../common/models/impl/common/user.info.model";
+import UserInfoIOModel from "../../../../common/models/io/common/user.info.io.model";
 
 const noop = () => { };
 const VALUE_ACCESSOR = provide(NG_VALUE_ACCESSOR, {
@@ -10,7 +10,7 @@ const VALUE_ACCESSOR = provide(NG_VALUE_ACCESSOR, {
     multi: true
 });
 
-class UserInfoModelCheck extends UserInfoModel {
+class UserInfoIOModelCheck extends UserInfoIOModel {
     public selected: boolean;
 }
 
@@ -18,7 +18,7 @@ class UserInfoModelCheck extends UserInfoModel {
     name: "onlychecked"
 })
 class ChatFilterPipe implements PipeTransform {
-    public transform(users: UserInfoModelCheck[], filters: boolean[]) {
+    public transform(users: UserInfoIOModelCheck[], filters: boolean[]) {
         if (filters.length == 0)
             return users;
 
@@ -41,11 +41,11 @@ class ChatFilterPipe implements PipeTransform {
 })
 class UsersCheckboxComponent implements OnInit, ControlValueAccessor {
     private service: UserService;
-    private users: UserInfoModelCheck[] = [];
+    private users: UserInfoIOModelCheck[] = [];
     private disabled: boolean;
     private onlychecked: boolean;
 
-    private _value: UserInfoModel[];
+    private _value: UserInfoIOModel[];
     private _onTouchedCallback: (_?: any) => void = noop;
     private _onChangeCallback: (_: any) => void = noop;
 
@@ -57,11 +57,11 @@ class UsersCheckboxComponent implements OnInit, ControlValueAccessor {
         this.initUsers();
     }
 
-    public get value(): UserInfoModel[] {
+    public get value(): UserInfoIOModel[] {
         return this._value;
     }
 
-    public set value(value: UserInfoModel[]) {
+    public set value(value: UserInfoIOModel[]) {
         if (this._value != value) {
             this._value = value;
             this.updateUsers(this.users);
@@ -83,10 +83,10 @@ class UsersCheckboxComponent implements OnInit, ControlValueAccessor {
 
     private initUsers() {
         this.service.list()
-            .map<UserInfoModelCheck[]>(model => {
+            .map<UserInfoIOModelCheck[]>(model => {
                 if (model.models && model.models.users)
                     return model.models.users
-                        .map(_ => new UserInfoModelCheck(<UserInfoModel>_));
+                        .map(_ => new UserInfoIOModelCheck(<UserInfoIOModel>_));
                 else
                     return [];
             })
@@ -95,7 +95,7 @@ class UsersCheckboxComponent implements OnInit, ControlValueAccessor {
             });
     }
 
-    private updateUsers(users: UserInfoModelCheck[]) {
+    private updateUsers(users: UserInfoIOModelCheck[]) {
         users.forEach(_ => {
             _.selected = this._value &&
                 this._value.some(__ => _._id == __._id);
@@ -103,11 +103,11 @@ class UsersCheckboxComponent implements OnInit, ControlValueAccessor {
         this.users = users;
     }
 
-    private onChange(event: boolean, target: UserInfoModelCheck) {
+    private onChange(event: boolean, target: UserInfoIOModelCheck) {
         target.selected = event;
         this._value = this.users
             .filter(_ => _.selected)
-            .map(_ => new UserInfoModel(_));
+            .map(_ => new UserInfoIOModel(_));
         this._onChangeCallback(this._value);
     }
 

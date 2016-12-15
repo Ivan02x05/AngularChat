@@ -1,21 +1,23 @@
-/// <reference path="../../../../typings/tsd.d.ts"/>
-
 import * as Q from "q";
 
 import {Container} from "../../common/container/container";
 import SocketBaseController from "../controllers/common/socket.base.controller";
+import errorhandler from "../handlers/socket.error.handler";
 
 export default function routing(socket: SocketIO.Socket) {
-
-    return Q.resolve<void>(null)
+    return Q.fcall(() => { })
         .then(() => {
-            var target = (<string>socket.handshake.query.controller).toLowerCase();
+            var target = socket.nsp.name.toLowerCase().substring("/".length);
             var type: SocketBaseController = require("../controllers/socket/" + target + ".controller").default;
-            var instance: SocketBaseController = Container.resolve(type, socket, [socket]);
-            return instance.init()
-                .then(() => instance.exec());
+            var instance: SocketBaseController = Container.resolve(type, socket);
+            return instance.exec()
+                .finally(() => {
+                    Container.remove(null, socket);
+                });
         })
-        .finally(() => {
-            Container.remove(null, socket);
+        .catch(error => {
+            errorhandler(error, socket, model => {
+                socket.emit("failure", model.data);
+            });
         });
 }

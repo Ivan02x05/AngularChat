@@ -1,12 +1,12 @@
 import {Injectable} from  "angular2/core";
 
-import BaseModel from "../../../../common/models/impl/common/base.model";
-import ResponseModel from "../../../../common/models/impl/common/response.model";
-import ErrorModel from "../../../../common/models/impl/common/error.model";
+import BaseIOModel from "../../../../common/models/io/common/base.io.model";
+import ResponseIOModel from "../../../../common/models/io/common/response.io.model";
+import ErrorIOModel from "../../../../common/models/io/common/error.io.model";
 import {ErrorConstant} from "../../../../common/constants/error.constant";
 import Exception from "../../exceptions/exception";
 
-export type ON_MESSAGE = (model?: ResponseModel) => any;
+export type ON_MESSAGE = (model?: ResponseIOModel) => any;
 export type ON_MESSAGE_MAP = { [key: string]: ON_MESSAGE };
 
 @Injectable()
@@ -22,16 +22,18 @@ class SocketService {
         this.eventsMap.get(message).set(fn, cb);
     }
 
-    protected initialize(controller: string, query: any = {}) {
-        query.controller = controller;
-        this.socket = io({
-            path: "/framework/socket.io",
-            query: query,
-            forceNew: true
+    protected initialize(controller: string) {
+        this.socket = io("ws://" + location.host + "/" + controller, {
+            path: "/framework/socket.io/",
+            forceNew: true,
+            transports: ["websocket"]
         });
 
         this.socket.on("connect", () => {
             this.onConnect();
+        });
+        this.socket.on("error", (error: Error) => {
+            this.onError(error);
         });
         this.socket.on("connect_error", (error: Error) => {
             this.onError(error);
@@ -47,7 +49,7 @@ class SocketService {
 
     public on(message: string, event: ON_MESSAGE, link?: Function) {
         var fn = (data: any) => {
-            event(new ResponseModel(data));
+            event(new ResponseIOModel(data));
         };
 
         if (link) {
@@ -81,9 +83,9 @@ class SocketService {
     }
 
     public set onFailure(cb: (error: Exception) => void) {
-        this.on("failure", (data: ResponseModel) => {
+        this.on("failure", (data: ResponseIOModel) => {
             cb(new Exception(data.errors
-                .map(_ => new ErrorModel(_.code, _.message, _.level))));
+                .map(_ => new ErrorIOModel(_.code, _.message, _.level))));
         }, cb);
     }
 
@@ -103,7 +105,7 @@ class SocketService {
         throw error;
     }
 
-    protected emit(event: string, model?: BaseModel | any) {
+    protected emit(event: string, model?: BaseIOModel) {
         this.socket.emit(event, model);
     }
 }

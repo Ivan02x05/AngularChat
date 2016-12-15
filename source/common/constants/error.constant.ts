@@ -37,6 +37,7 @@ export namespace ErrorConstant {
             export const DB_QUERY: string = Prefix.FATAL + "003";
             export const SESSION_TIMEOUT: string = Prefix.FATAL + "004";
             export const FILE_IO: string = Prefix.FATAL + "005";
+            export const COMMUNICATION_TIMEOUT: string = Prefix.FATAL + "006";
             export const UN_DEFINED: string = Prefix.FATAL + "999";
         }
     }

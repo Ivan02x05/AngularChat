@@ -1,11 +1,10 @@
-
 import {Component, provide, OnInit, OnDestroy, Pipe, PipeTransform} from  "angular2/core";
 import {Router, RouteConfig, RouterOutlet, CanActivate} from  "angular2/router";
 
 import {FORM_DIRECTIVES} from "../common/form.component";
 import ChatService from "../../services/chat.socket.service";
-import ChatModel from "../../../../common/models/impl/chat/chat.model";
-import {ChatMessageModel} from "../../../../common/models/impl/chat/chat.message.model";
+import ChatIOModel from "../../../../common/models/io/chat/chat.io.model";
+import {ChatMessageIOModel} from "../../../../common/models/io/chat/chat.message.io.model";
 import ChatNewComponent from "./chat.new.component";
 import ChatDetailComponent from "./chat.detail.component";
 import ChatDefaultComponent from "./chat.default.component";
@@ -17,7 +16,7 @@ import NotificationManerger from "../../manergers/notification.manerger";
     pure: false
 })
 class ChatFilterPipe implements PipeTransform {
-    public transform(chats: ChatModel[], filters: string[]) {
+    public transform(chats: ChatIOModel[], filters: string[]) {
         if (filters.length == 0
             || filters[0] == null)
             return chats;
@@ -59,7 +58,7 @@ class ChatTopComponent implements OnInit, OnDestroy {
     private service: ChatService;
 
     private notification: NotificationManerger;
-    private chats: ChatModel[] = [];
+    private chats: ChatIOModel[] = [];
     private router: Router;
     private filter: string;
 
@@ -97,18 +96,18 @@ class ChatTopComponent implements OnInit, OnDestroy {
         this.service.onAddMessage = this.chatEvents[5];
     }
 
-    private onChatList(chats: ChatModel[]) {
+    private onChatList(chats: ChatIOModel[]) {
         this.chats = chats;
     }
 
-    private onRegist(chat: ChatModel) {
+    private onRegist(chat: ChatIOModel) {
         this.chats.unshift(chat);
         this.notification.notification(chat.title, "グループ追加", () => {
             this.select(chat);
         });
     }
 
-    private onRegisted(chat: ChatModel) {
+    private onRegisted(chat: ChatIOModel) {
         var original = this.chats.filter(_ => _._id == chat._id);
         if (original.length > 0)
             this.select(original[0]);
@@ -118,7 +117,7 @@ class ChatTopComponent implements OnInit, OnDestroy {
             }, 0);
     }
 
-    private onDelete(chat: ChatModel) {
+    private onDelete(chat: ChatIOModel) {
         var original = this.chats.filter(_ => _._id == chat._id)[0];
         this.chats.splice(this.chats.indexOf(original), 1);
         if (original.active)
@@ -127,7 +126,7 @@ class ChatTopComponent implements OnInit, OnDestroy {
         this.notification.notification(original.title, "グループ削除");
     }
 
-    private onUpdate(chat: ChatModel) {
+    private onUpdate(chat: ChatIOModel) {
         var original = this.chats.filter(_ => _._id == chat._id)[0];
         var index = this.chats.indexOf(original);
         chat.unread = original.unread;
@@ -140,7 +139,7 @@ class ChatTopComponent implements OnInit, OnDestroy {
         });
     }
 
-    private onAddMessage(chat: ChatModel, message: ChatMessageModel) {
+    private onAddMessage(chat: ChatIOModel, message: ChatMessageIOModel) {
         var original = this.chats.filter(_ => _._id == chat._id)[0];
         if (!original.active)
             if (!original.unread)
@@ -159,7 +158,7 @@ class ChatTopComponent implements OnInit, OnDestroy {
         this.router.navigate(["New"]);
     }
 
-    private select(chat: ChatModel) {
+    private select(chat: ChatIOModel) {
         this.clearActive();
         chat.active = true;
         chat.unread = null;

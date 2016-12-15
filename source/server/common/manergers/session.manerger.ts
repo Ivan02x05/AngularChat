@@ -1,9 +1,9 @@
-import SessionModel from "../../../common/models/impl/common/session.model";
+import SessionIOModel from "../../../common/models/io/common/session.io.model";
 
 class SessionManerger {
-    public session: SessionModel;
+    public session: SessionIOModel;
 
-    constructor(session: SessionModel) {
+    constructor(session: SessionIOModel) {
         this.session = session;
     }
 }

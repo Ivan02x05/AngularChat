@@ -1,8 +1,10 @@
 import {Component, provide} from  "angular2/core";
 
 import ChatService from "../../services/chat.socket.service";
-import ChatModel from "../../../../common/models/impl/chat/chat.model";
-import {ChatMessagesModel, ChatMessageModel, ChatGetMessageListModel} from "../../../../common/models/impl/chat/chat.message.model";
+import ChatIOModel from "../../../../common/models/io/chat/chat.io.model";
+import {ChatMessagesIOModel, ChatMessageIOModel, ChatGetMessageListIOModel}
+from "../../../../common/models/io/chat/chat.message.io.model";
+
 import ChatMessageListAbstractComponent from "./chat.message.list.abstract.component";
 import ChatMessageListComponent from "./chat.message.list.component";
 
@@ -26,7 +28,7 @@ class ChatMessageListNormalComponent extends ChatMessageListAbstractComponent {
 
     private getMessageList() {
         this.connecting = true;
-        this.service.getMessageList(new ChatGetMessageListModel(
+        this.service.getMessageList(new ChatGetMessageListIOModel(
             {
                 _id: this.chat._id,
                 skip: this.messages.unshown
@@ -34,7 +36,7 @@ class ChatMessageListNormalComponent extends ChatMessageListAbstractComponent {
         ));
     }
 
-    private onMessageList(messages: ChatMessagesModel) {
+    private onMessageList(messages: ChatMessagesIOModel) {
         for (var m of messages.messages)
             this.messages.messages.push(m);
 
@@ -42,7 +44,7 @@ class ChatMessageListNormalComponent extends ChatMessageListAbstractComponent {
         this.connecting = false;
     }
 
-    public getMessagesList(): ChatMessageModel[] {
+    public getMessagesList(): ChatMessageIOModel[] {
         return this.messages.messages;
     }
 }

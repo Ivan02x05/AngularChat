@@ -1,45 +1,35 @@
-/// <reference path="../../../../typings/tsd.d.ts"/>
-
 import * as Q from "q";
 
-import DivisionModel from "../../../common/models/impl/common/division.model";
+import DivisionIOModel from "../../../common/models/io/common/division.io.model";
 import {lifecycle, LifeCycle, inject} from "../container/inject.decorator";
 import DataBase from "../../database/database";
 import DivisionSchema from "../../database/schemas/division.schema";
 import Container from "../../common/container/container";
 
 @lifecycle(LifeCycle.Singleton)
-@inject([{ clazz: DataBase }])
 class DivisionManerger {
-    private static deferred: Q.Deferred<void> = Q.defer<void>();
+    private _divisions: Map<string, Map<string, DivisionIOModel>> =
+    new Map<string, Map<string, DivisionIOModel>>();
 
-    private _divisions: Map<string, Map<string, DivisionModel>> =
-    new Map<string, Map<string, DivisionModel>>();
-
-    constructor(database?: DataBase) {
-        this.create(database);
+    public initialize(): Q.Promise<void> {
+        return this.create();
     }
 
-    private create(database: DataBase) {
-        database.model(DivisionSchema)
+    @inject([{ clazz: DataBase }])
+    private create(database?: DataBase): Q.Promise<void> {
+        return database.model(DivisionSchema)
             .find({ "systemColumn.deleteFlag": false })
             .then((data) => {
                 data.forEach((_) => {
                     if (!this._divisions.has(_.code))
-                        this._divisions.set(_.code, new Map<string, DivisionModel>());
+                        this._divisions.set(_.code, new Map<string, DivisionIOModel>());
 
-                    this._divisions.get(_.code).set(_.subcode, new DivisionModel(_));
-                })
-                DivisionManerger.deferred.resolve();
-            });
+                    this._divisions.get(_.code).set(_.subcode, new DivisionIOModel(_));
+                });
+            })
     }
 
-    public static initialize(): Q.Promise<void> {
-        Container.regist(DivisionManerger);
-        return DivisionManerger.deferred.promise;
-    }
-
-    public getDivision(code: string, subcode: string): DivisionModel {
+    public getDivision(code: string, subcode: string): DivisionIOModel {
         if (this._divisions.has(code)
             && this._divisions.get(code).has(subcode))
             return this._divisions.get(code).get(subcode);
@@ -55,7 +45,7 @@ class DivisionManerger {
             return null;
     }
 
-    public get divisions(): Map<string, Map<string, DivisionModel>> {
+    public get divisions(): Map<string, Map<string, DivisionIOModel>> {
         return this._divisions;
     }
 }

@@ -1,11 +1,9 @@
-/// <reference path="../../../typings/tsd.d.ts"/>
-
 import * as Q from "q";
 
 import BaseService from "./common/base.service";
 import {service, method} from "./common/service.decorator";
-import {UserModel, UserGetModel} from "../../common/models/impl/common/user.model";
-import UserInfoModel from "../../common/models/impl/common/user.info.model";
+import {UserIOModel, UserGetIOModel} from "../../common/models/io/common/user.io.model";
+import UserInfoIOModel from "../../common/models/io/common/user.info.io.model";
 import UserBusiness from "../business/user.business";
 import SessionManerger from "../common/manergers/session.manerger";
 import {ErrorConstant} from "../../common/constants/error.constant";
@@ -26,7 +24,7 @@ class UserService extends BaseService {
     }
 
     @method()
-    public getUser(model: UserGetModel): Q.Promise<any> {
+    public getUser(model: UserGetIOModel): Q.Promise<any> {
         var result = this.result;
         var business = this.getComponent(UserBusiness);
         var session = this.getComponent(SessionManerger);
@@ -45,7 +43,7 @@ class UserService extends BaseService {
     }
 
     @method()
-    public regist(model: UserModel): Q.Promise<any> {
+    public regist(model: UserIOModel): Q.Promise<any> {
         var result = this.result;
         var business = this.getComponent(UserBusiness);
         var session = this.getComponent(SessionManerger);
@@ -70,13 +68,13 @@ class UserService extends BaseService {
     }
 
     @method()
-    public update(model: UserModel): Q.Promise<any> {
+    public update(model: UserIOModel): Q.Promise<any> {
         var result = this.result;
         var business = this.getComponent(UserBusiness);
         var session = this.getComponent(SessionManerger);
 
         return business.findById(model._id)
-            .then<UserModel>(_ => {
+            .then<UserIOModel>(_ => {
                 if (_ == null)
                     return Q.reject(new Exception(ErrorConstant.Code.Fatal.UN_DEFINED));
 
@@ -107,7 +105,7 @@ class UserService extends BaseService {
     }
 
     @method()
-    public delete(model: UserModel): Q.Promise<any> {
+    public delete(model: UserIOModel): Q.Promise<any> {
         var result = this.result;
         var business = this.getComponent(UserBusiness);
         var session = this.getComponent(SessionManerger);

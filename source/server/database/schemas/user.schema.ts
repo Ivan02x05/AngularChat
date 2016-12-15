@@ -1,12 +1,12 @@
 import BaseSchema from "./base.schema";
-import {UserModel, UserDocument} from "../models/user.model";
+import {UserDBModel, UserDocument} from "../models/user.db.model";
 import {CodeConstant} from "../../../common/constants/code.constant";
 import {DataBaseConstant} from "../../common/constants/database.constant";
 import DivisionSaveSchema from "./division.save.schema";
 
-export {UserModel, UserDocument};
+export {UserDBModel, UserDocument};
 
-export class UserSchema extends BaseSchema<UserModel> {
+export class UserSchema extends BaseSchema<UserDBModel> {
     constructor() {
         const schema: Object =
             {
@@ -28,7 +28,7 @@ export class UserSchema extends BaseSchema<UserModel> {
     }
 
     public getModelType() {
-        return UserModel;
+        return UserDBModel;
     }
 }
 

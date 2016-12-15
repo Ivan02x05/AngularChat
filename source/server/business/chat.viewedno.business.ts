@@ -1,20 +1,18 @@
-/// <reference path="../../../typings/tsd.d.ts"/>
-
 import * as Q from "q";
 
 import BaseBusiness from "./common/base.business";
 import ChatViewedNoSchema from "../database/schemas/chat.viewedno.schema";
-import ChatViewedNoModel from "../../common/models/impl/chat/chat.viewedno.model";
+import ChatViewedNoIOModel from "../../common/models/io/chat/chat.viewedno.io.model";
 import SessionManerger from "../common/manergers/session.manerger";
 
 class ChatViewedNoBusiness extends BaseBusiness {
 
-    public findById(id: any): Q.Promise<ChatViewedNoModel> {
+    public findById(id: any): Q.Promise<ChatViewedNoIOModel> {
         return this.database.model(ChatViewedNoSchema).findById(id)
-            .then(result => new ChatViewedNoModel(result));
+            .then(result => new ChatViewedNoIOModel(result));
     }
 
-    public save(model: ChatViewedNoModel): Q.Promise<ChatViewedNoModel> {
+    public save(model: ChatViewedNoIOModel): Q.Promise<ChatViewedNoIOModel> {
         var viewed = this.database.model(ChatViewedNoSchema);
         return Q.resolve(null)
             .then(() => {
@@ -34,7 +32,7 @@ class ChatViewedNoBusiness extends BaseBusiness {
             .then(doc => {
                 if (doc) {
                     return viewed.save(doc)
-                        .then(result => new ChatViewedNoModel(result));
+                        .then(result => new ChatViewedNoIOModel(result));
                 }
                 else
                     return null;

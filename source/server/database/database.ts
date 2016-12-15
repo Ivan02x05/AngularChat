@@ -1,6 +1,4 @@
-import BaseSchema from "./schemas/base.schema";
-import BaseDocument from "./documents/base.document";
-import BaseModel from "./models/base.model";
+import {BaseSchema, BaseDocument, BaseDBModel} from "./schemas/base.schema";
 import Connection from "./connection";
 import {Container, Cache} from "../common/container/container";
 import {inject} from "../common/container/inject.decorator";
@@ -14,7 +12,7 @@ export class DataBase {
         this.connection = connection;
     }
 
-    public model<S extends BaseSchema<M>, M extends BaseModel<D>, D extends BaseDocument>(
+    public model<S extends BaseSchema<M>, M extends BaseDBModel<D>, D extends BaseDocument>(
         schema: { new (): BaseSchema<M> }): M {
 
         var sch = BaseSchema.getSchema(schema);

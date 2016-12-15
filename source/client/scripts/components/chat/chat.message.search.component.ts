@@ -2,8 +2,8 @@ import {Component, provide, OnInit} from  "angular2/core";
 
 import {default as FormComponent, FORM_DIRECTIVES} from "../common/form.component";
 import ChatService from "../../services/chat.socket.service";
-import ChatModel from "../../../../common/models/impl/chat/chat.model";
-import {ChatSearchMessagesModel} from "../../../../common/models/impl/chat/chat.message.model";
+import ChatIOModel from "../../../../common/models/io/chat/chat.io.model";
+import {ChatSearchMessagesIOModel} from "../../../../common/models/io/chat/chat.message.io.model";
 import Exception from "../../exceptions/exception";
 
 @Component({
@@ -17,7 +17,7 @@ import Exception from "../../exceptions/exception";
 })
 class ChatMessageSearchComponent extends FormComponent implements OnInit {
     private service: ChatService;
-    private chat: ChatModel;
+    private chat: ChatIOModel;
     private condition: string;
 
     private chatEvents = [];
@@ -59,7 +59,7 @@ class ChatMessageSearchComponent extends FormComponent implements OnInit {
     private search() {
         this.clearError();
         this.submit(() => {
-            this.service.search(new ChatSearchMessagesModel(
+            this.service.search(new ChatSearchMessagesIOModel(
                 {
                     _id: this.chat._id,
                     condition: this.condition

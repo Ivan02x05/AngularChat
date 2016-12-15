@@ -35,6 +35,7 @@ export class Container {
         if (this.parent) {
             this.parent.addChild(this);
         }
+        Container.containers.set(host, this);
     }
 
     public addChild(child: Container) {
@@ -61,6 +62,22 @@ export class Container {
         clazz.apply(obj, params);
         this.objects.set(clazz, obj);
         return obj;
+    }
+
+    public static registInstance(clazz: any): any {
+        if (Container.singleton.has(clazz.constructor)) {
+            // importすると矛盾参照となる
+            var Exception = require("../exceptions/exception").default;
+            throw new Exception(ErrorConstant.Code.Fatal.INSTANCE_DUPLICATE);
+        }
+        Container.singleton.set(clazz.constructor, clazz);
+        return clazz;
+    }
+
+    public registInstance(clazz: any): any {
+        clazz.container = this;
+        this.objects.set(clazz.constructor, clazz);
+        return clazz;
     }
 
     public static remove(clazz?: any, host?: any) {
@@ -135,22 +152,28 @@ export class Container {
 
             return Container.singleton.get(clazz);
         } else {
-            if (host == null)
-                return null;
+            if (host == null) {
+                if (cache == Cache.UseCache) {
+                    if (Container.singleton.has(clazz))
+                        return Container.singleton.get(clazz);
+                    else
+                        return null;
+                }
+                else
+                    return null;
+            }
 
             var container: Container;
             if (Container.containers.has(host))
                 container = Container.containers.get(host);
-            else {
+            else
                 container = new Container(host);
-                Container.containers.set(host, container);
-            }
 
-            return container.resolve(clazz, host, params, cache);
+            return container.resolve(clazz, params, cache);
         }
     }
 
-    public resolve(clazz: any, host?: any, params?: any[], cache?: Cache): any {
+    public resolve(clazz: any, params?: any[], cache?: Cache, regist = true): any {
         if (LifeCycle.Singleton == <LifeCycle>clazz.lifecycle) {
             // singleton
             if (!Container.singleton.has(clazz))
@@ -168,13 +191,14 @@ export class Container {
                 return this.host;
             } else {
                 if (this.parent) {
-                    var obj: any = this.parent.resolve(clazz);
+                    var obj: any = this.parent.resolve(clazz, null, null, false);
                     if (obj) {
                         return obj;
                     }
                 }
 
-                if (!host)
+                if (!regist)
+                    // parentより実行されるため、判定が必要
                     return null;
 
                 return this.regist(clazz, params);

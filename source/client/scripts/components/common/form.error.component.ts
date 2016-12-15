@@ -1,6 +1,6 @@
 import {Component, OnInit} from "angular2/core";
 
-import ErrorModel from "../../../../common/models/impl/common/error.model";
+import ErrorIOModel from "../../../../common/models/io/common/error.io.model";
 import FormDirective from "../../directives/form.directive";
 
 @Component({
@@ -8,7 +8,7 @@ import FormDirective from "../../directives/form.directive";
     templateUrl: "scripts/components/common/form.error.html"
 })
 class FormErrorComponent implements OnInit {
-    private errors: ErrorModel[];
+    private errors: ErrorIOModel[];
     private form: FormDirective;
 
     constructor(form: FormDirective) {
@@ -21,7 +21,7 @@ class FormErrorComponent implements OnInit {
         );
     }
 
-    private onCange(errors: ErrorModel[]) {
+    private onCange(errors: ErrorIOModel[]) {
         this.errors = errors && errors.length > 0 ? errors : null;
     }
 }

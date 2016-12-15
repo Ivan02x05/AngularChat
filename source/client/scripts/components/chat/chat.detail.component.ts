@@ -2,10 +2,12 @@ import {Component, provide, OnInit, OnDestroy, ViewChild, ElementRef} from  "ang
 import {RouteParams} from  "angular2/router";
 
 import ChatService from "../../services/chat.socket.service";
-import {default as ChatModel, ChatJoinModel} from "../../../../common/models/impl/chat/chat.model";
-import ErrorModel from "../../../../common/models/impl/common/error.model";
-import DivisionSaveModel from "../../../../common/models/impl/common/division.save.model";
-import {default as ChatMessagesModel, ChatMessageModel, ChatMessageDataModel} from "../../../../common/models/impl/chat/chat.message.model";
+import {ChatIOModel, ChatJoinIOModel} from "../../../../common/models/io/chat/chat.io.model";
+import ErrorIOModel from "../../../../common/models/io/common/error.io.model";
+import DivisionSaveIOModel from "../../../../common/models/io/common/division.save.io.model";
+import {default as ChatMessagesIOModel, ChatMessageIOModel, ChatMessageDataIOModel}
+from "../../../../common/models/io/chat/chat.message.io.model";
+
 import ChatEditComponent from "./chat.edit.component";
 import ChatMessageRegistComponent from "./chat.message.regist.component";
 import ChatMessageSearchComponent from "./chat.message.search.component";
@@ -38,8 +40,8 @@ enum Mode {
 class ChatDetailComponent implements OnInit, OnDestroy {
     private element: ElementRef;
     private code: number;
-    private chat: ChatModel;
-    private messages: ChatMessagesModel;
+    private chat: ChatIOModel;
+    private messages: ChatMessagesIOModel;
     private service: ChatService;
     private manerger: MessageManerger;
     private toggled: boolean = true;
@@ -63,7 +65,7 @@ class ChatDetailComponent implements OnInit, OnDestroy {
 
     public ngOnInit() {
         this.initService();
-        this.service.join(new ChatJoinModel(
+        this.service.join(new ChatJoinIOModel(
             {
                 code: this.code
             }
@@ -71,7 +73,7 @@ class ChatDetailComponent implements OnInit, OnDestroy {
     }
 
     public ngOnDestroy() {
-        this.service.exit(new ChatJoinModel(
+        this.service.exit(new ChatJoinIOModel(
             {
                 code: this.code
             }
@@ -90,16 +92,16 @@ class ChatDetailComponent implements OnInit, OnDestroy {
         this.service.onDownload = this.chatEvents[2];
     }
 
-    private onJoin(chat: ChatModel, messages: ChatMessagesModel) {
+    private onJoin(chat: ChatIOModel, messages: ChatMessagesIOModel) {
         this.chat = chat;
         this.messages = messages;
         if (this.chat.unread && this.chat.unread > 0) {
-            this.messages.messages.splice(this.chat.unread, 0, new ChatMessageModel(
+            this.messages.messages.splice(this.chat.unread, 0, new ChatMessageIOModel(
                 {
-                    message: new ChatMessageDataModel(
+                    message: new ChatMessageDataIOModel(
                         {
                             data: this.manerger.getMessage(ErrorConstant.Code.Info.UNREAD).message,
-                            type: new DivisionSaveModel(
+                            type: new DivisionSaveIOModel(
                                 {
                                     subcode: CodeConstant.Division.SubCode.MessageType.UNREAD
                                 }),
@@ -119,7 +121,7 @@ class ChatDetailComponent implements OnInit, OnDestroy {
         }
     }
 
-    private onUpdated(chat: ChatModel) {
+    private onUpdated(chat: ChatIOModel) {
         this.toggled = true;
         this.chat = chat;
     }
@@ -147,14 +149,14 @@ class ChatDetailComponent implements OnInit, OnDestroy {
 
     private onDownloadAll() {
         this.downloading = true;
-        this.service.download(new ChatJoinModel(
+        this.service.download(new ChatJoinIOModel(
             {
                 code: this.chat.code
             }
         ));
     }
 
-    private onDownload(model: ChatMessagesModel) {
+    private onDownload(model: ChatMessagesIOModel) {
         this.downloading = true;
         var anchor = this.downloadBtn.nativeElement;
         anchor.href = this.createCsvFile(model.messages);
@@ -170,7 +172,7 @@ class ChatDetailComponent implements OnInit, OnDestroy {
         }, 0);
     }
 
-    private createCsvFile(messages: ChatMessageModel[]): string {
+    private createCsvFile(messages: ChatMessageIOModel[]): string {
         var data: any[][] = [];
         data.push(["コード", "タイトル", "公開範囲", "対象者", "種別", "メッセージ", "登録者", "日時"]);
         messages.forEach(_ => {

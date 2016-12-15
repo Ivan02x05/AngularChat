@@ -1,12 +1,10 @@
-/// <reference path="../../../typings/tsd.d.ts"/>
-
 import * as Q from "q";
 
 import BaseService from "./common/base.service";
 import ServideResult from "./common/service.result";
 import {service, method} from "./common/service.decorator";
 import DivisionManerger from "../common/manergers/division.manerger";
-import DivisionModel from "../../common/models/impl/common/division.model";
+import DivisionIOModel from "../../common/models/io/common/division.io.model";
 
 @service
 class DivisionService extends BaseService {
@@ -18,7 +16,7 @@ class DivisionService extends BaseService {
             var manerger = BaseService.getComponent(DivisionManerger);
 
             // convert
-            var divisions: DivisionModel[] = [];
+            var divisions: DivisionIOModel[] = [];
             manerger.divisions.forEach(v1 => {
                 v1.forEach(v2 => {
                     divisions.push(v2);

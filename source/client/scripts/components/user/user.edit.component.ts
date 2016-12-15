@@ -3,8 +3,8 @@ import {Component, provide, Input, Output, EventEmitter, ViewChild} from  "angul
 
 import {default as FormComponent, FORM_DIRECTIVES} from "../common/form.component";
 import UserService from "../../services/user.http.service";
-import {UserModel as UserModelOrg, UserGetModel} from "../../../../common/models/impl/common/user.model";
-import ResponseModel from "../../../../common/models/impl/common/response.model";
+import {UserIOModel as UserIOModelOrg, UserGetIOModel} from "../../../../common/models/io/common/user.io.model";
+import ResponseIOModel from "../../../../common/models/io/common/response.io.model";
 import {Observable} from "rxjs/Rx";
 
 export const enum Mode {
@@ -13,7 +13,7 @@ export const enum Mode {
     Delete
 }
 
-class UserModel extends UserModelOrg {
+class UserIOModel extends UserIOModelOrg {
     public password2: string;
 
     constructor(obj?: any) {
@@ -34,21 +34,21 @@ class UserModel extends UserModelOrg {
     outputs: ["onChange"]
 })
 class UserEditComponent extends FormComponent {
-    private model: UserModel = null;
+    private model: UserIOModel = null;
     private mode: Mode = Mode.Regist;
     private service: UserService;
     private set target(id: string) {
-        var initModel = () => {
+        var initIOModel = () => {
             setTimeout(() => {
-                this.model = new UserModel({ name: { first: null, last: null } });
+                this.model = new UserIOModel({ name: { first: null, last: null } });
                 this.mode = Mode.Regist;
             }, 0);
         };
 
         if (id != null) {
-            this.service.getUser(new UserGetModel({ _id: id })).subscribe((model) => {
+            this.service.getUser(new UserGetIOModel({ _id: id })).subscribe((model) => {
                 this.mode = Mode.Update;
-                this.model = new UserModel(model.models.user);
+                this.model = new UserIOModel(model.models.user);
 
                 setTimeout(() => {
                     this.form.controls["password"].updateValueAndValidity();
@@ -60,15 +60,15 @@ class UserEditComponent extends FormComponent {
             if (this.model != null) {
                 setTimeout(() => {
                     this.model = null;
-                    initModel();
+                    initIOModel();
                 }, 0);
             } else
-                initModel();
+                initIOModel();
         }
         this.clearError();
     }
 
-    private onChange: EventEmitter<{ mode: Mode, model: UserModel }> = new EventEmitter();
+    private onChange: EventEmitter<{ mode: Mode, model: UserIOModel }> = new EventEmitter();
 
     private get isNew(): boolean {
         return this.mode == Mode.Regist;
@@ -96,7 +96,7 @@ class UserEditComponent extends FormComponent {
         this.clearError();
 
         this.submit(() => {
-            var method: (model: UserModelOrg) => Observable<ResponseModel>;
+            var method: (model: UserIOModelOrg) => Observable<ResponseIOModel>;
             switch (mode) {
                 case Mode.Regist:
                     method = this.service.regist;
@@ -111,11 +111,11 @@ class UserEditComponent extends FormComponent {
                     break;
             }
 
-            method.bind(this.service)(new UserModelOrg(this.model)).subscribe((model) => {
+            method.bind(this.service)(new UserIOModelOrg(this.model)).subscribe((model) => {
                 if (model.hasError) {
                     this.addError(model.errors);
                 } else {
-                    this.model = new UserModel(model.models.user);
+                    this.model = new UserIOModel(model.models.user);
                     this.onChange.emit({ mode: mode, model: this.model });
                 }
             });

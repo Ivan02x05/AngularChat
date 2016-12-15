@@ -3,8 +3,8 @@ import {NG_VALIDATORS, AbstractControl} from "angular2/common";
 
 import {default as FormComponent, FORM_DIRECTIVES} from "../common/form.component";
 import ChatService from "../../services/chat.socket.service";
-import ChatModel from "../../../../common/models/impl/chat/chat.model";
-import UserModel from "../../../../common/models/impl/common/user.model";
+import ChatIOModel from "../../../../common/models/io/chat/chat.io.model";
+import UserIOModel from "../../../../common/models/io/common/user.io.model";
 import Exception from "../../exceptions/exception";
 import {ValidatorBase, ErrorConstant} from "../../validators/validator.common";
 import UserManerger from "../../manergers/user.manerger";
@@ -16,7 +16,7 @@ import UserManerger from "../../manergers/user.manerger";
 })
 class PermissionValidator extends ValidatorBase {
     private condition: boolean;
-    private user: UserModel;
+    private user: UserIOModel;
 
     constructor(manerger: UserManerger) {
         super();
@@ -45,14 +45,14 @@ class PermissionValidator extends ValidatorBase {
 class ChatEditComponent extends FormComponent implements OnInit, OnDestroy {
     private service: ChatService;
 
-    private cache: ChatModel;
-    private _model: ChatModel = new ChatModel();
-    private set model(model: ChatModel) {
-        this._model = new ChatModel(model);
+    private cache: ChatIOModel;
+    private _model: ChatIOModel = new ChatIOModel();
+    private set model(model: ChatIOModel) {
+        this._model = new ChatIOModel(model);
         this.cache = model;
         this.editable = model == null;
     }
-    private get model(): ChatModel {
+    private get model(): ChatIOModel {
         return this._model;
     }
 
@@ -86,7 +86,7 @@ class ChatEditComponent extends FormComponent implements OnInit, OnDestroy {
 
     private cancel() {
         this.clearError();
-        this.model = new ChatModel(this.cache);
+        this.model = new ChatIOModel(this.cache);
         this.editable = false;
     }
 

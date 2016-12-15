@@ -1,47 +1,71 @@
 import * as Q from "q";
 
-import {default as SocketBaseController, ON_MESSAGE_MAP} from "../common/socket.base.controller";
-import {controller, message} from "../common/controller.decorator";
-import UserModel from "../../../../common/models/impl/common/user.model";
-import ResponseModel from "../../../../common/models/impl/common/response.model";
+import {default as SocketBaseController, ON_MESSAGE_MAP, controller, message, scaleout} from "../common/socket.base.controller";
+import ResponseIOModel from "../../../../common/models/io/common/response.io.model";
+import {SystemConstant} from "../../../common/constants/system.constant";
+import UserScaleoutModel from "../../scaleout/models/common/user.scaleout.model";
 
-@controller
+@controller()
 class TopController extends SocketBaseController {
-    public static sockets: TopController[] = [];
-
     protected initialize(): ON_MESSAGE_MAP {
         return {
             "logout": this.onLogout
         };
     }
 
-    @message()
-    protected onLogout() {
-        var user: UserModel = this.session.user;
-        (<any>this.session).destroy(() => {
-            this.emit("logout");
-            SocketBaseController.onChangedSessionSubject.next(user);
-        });
-        return Q.resolve<void>(null);
-    }
-
     protected onConnect() {
-        super.onConnect();
-        TopController.sockets.push(this);
+        return super.onConnect()
+            .then(() => Q.all([
+                this.provide(SystemConstant.Scaleout.Events.Provide.Common.LOGIN_USER, this.onClientProvide),
+                this.subscribe(SystemConstant.Scaleout.Events.Subscribe.Common
+                    .USER_UPDATE, (model: UserScaleoutModel) => {
+                        if (this.session.user._id == model.user._id)
+                            this.onUserUpdateSubscribe(model);
+                    }
+                ),
+                this.subscribe(SystemConstant.Scaleout.Events.Subscribe.Common
+                    .USER_DELETE, (model: UserScaleoutModel) => {
+                        if (this.session.user._id == model.user._id)
+                            this.onUserDeleteSubscribe(model);
+                    }
+                )
+            ]))
+            .then(() => { });
     }
 
-    protected onDisconnect() {
-        var index = TopController.sockets.indexOf(this);
-        TopController.sockets.splice(index, 1);
-
-        super.onDisconnect();
-    }
-
-    protected onChangedSession(): Q.Promise<void> {
-        return super.onChangedSession()
+    @scaleout()
+    protected onUserUpdateSubscribe(model: UserScaleoutModel): Q.Promise<void> {
+        this.session.user = model.user;
+        return Q.nfcall(this.session.save.bind(this.session))
+            .then(() => this.publish(SystemConstant.Scaleout.Events.Subscribe.Common
+                .SESSION_CHANGE, model))
             .then(() => {
-                if (this.session)
-                    this.emit("update", new ResponseModel({ models: { user: this.session.user } }));
+                this.emit("update", new ResponseIOModel({ models: { user: this.session.user } }));
+            })
+    }
+
+    @scaleout()
+    protected onUserDeleteSubscribe(model: UserScaleoutModel): Q.Promise<void> {
+        return this.onLogout();
+    }
+
+    protected onClientProvide(): Q.Promise<UserScaleoutModel> {
+        return Q.fcall(() => new UserScaleoutModel({
+            sender: this.socket.id,
+            user: this.session.user
+        }));
+    }
+
+    @message()
+    protected onLogout(): Q.Promise<void> {
+        var user = this.session.user;
+        return Q.nfcall(this.session.destroy.bind(this.session))
+            .then(() => {
+                this.emit("logout");
+                this.publish(SystemConstant.Scaleout.Events.Subscribe.Common
+                    .SESSION_CHANGE, new UserScaleoutModel({
+                        user: user
+                    }));
             });
     }
 }

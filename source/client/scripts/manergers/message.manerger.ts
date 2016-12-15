@@ -2,17 +2,17 @@ import {Injectable} from  "angular2/core";
 import {Observable} from "rxjs/Rx";
 
 import MessageService from "../services/message.http.service";
-import MessageModel from "../../../common/models/impl/common/message.model";
+import MessageIOModel from "../../../common/models/io/common/message.io.model";
 
 @Injectable()
 class MessageManerger {
     private observable: Observable<MessageManerger>;
-    private messages: Map<string, MessageModel> = new Map<string, MessageModel>();
+    private messages: Map<string, MessageIOModel> = new Map<string, MessageIOModel>();
 
     constructor(service: MessageService) {
         this.observable = Observable.create((observer) => {
             service.list()
-                .map((response) => <MessageModel[]>response.models.messages)
+                .map((response) => <MessageIOModel[]>response.models.messages)
                 .subscribe(
                 (messages) => {
                     messages.map((message) => {
@@ -29,9 +29,9 @@ class MessageManerger {
         return this.observable;
     }
 
-    public getMessage(code: string, args?: string[]): MessageModel {
+    public getMessage(code: string, args?: string[]): MessageIOModel {
         if (this.messages.has(code)) {
-            var messages: MessageModel = <MessageModel>Object
+            var messages: MessageIOModel = <MessageIOModel>Object
                 .assign({}, this.messages.get(code));
 
             if (args) {

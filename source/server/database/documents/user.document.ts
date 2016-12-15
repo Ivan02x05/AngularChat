@@ -1,4 +1,4 @@
-import IUserModel from "../../../common/models/common/user.model.interface";
+import IUserModel from "../../../common/models/if/common/user.model.interface";
 import BaseDocument from "./base.document";
 
 interface UserDocument extends IUserModel, BaseDocument {

@@ -1,5 +1,3 @@
-/// <reference path="../../../typings/tsd.d.ts"/>
-
 import {Mongoose}  from "mongoose";
 
 import Connection from "./connection";

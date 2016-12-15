@@ -2,9 +2,9 @@ import {Component, provide, OnInit} from  "angular2/core";
 
 import {default as FormComponent, FORM_DIRECTIVES} from "../common/form.component";
 import ChatService from "../../services/chat.socket.service";
-import ChatModel from "../../../../common/models/impl/chat/chat.model";
-import DivisionSaveModel from "../../../../common/models/impl/common/division.save.model";
-import {ChatMessageDataModel, ChatAddMessageModel} from "../../../../common/models/impl/chat/chat.message.model";
+import ChatIOModel from "../../../../common/models/io/chat/chat.io.model";
+import DivisionSaveIOModel from "../../../../common/models/io/common/division.save.io.model";
+import {ChatMessageDataIOModel, ChatAddMessageIOModel} from "../../../../common/models/io/chat/chat.message.io.model";
 import Exception from "../../exceptions/exception";
 
 @Component({
@@ -18,7 +18,7 @@ import Exception from "../../exceptions/exception";
 })
 class ChatMessageRegistComponent extends FormComponent implements OnInit {
     private service: ChatService;
-    private chat: ChatModel;
+    private chat: ChatIOModel;
     private message: string;
 
     private chatEvents = [];
@@ -59,13 +59,13 @@ class ChatMessageRegistComponent extends FormComponent implements OnInit {
     private addMessage() {
         this.clearError();
         this.submit(() => {
-            this.service.addMessage(new ChatAddMessageModel(
+            this.service.addMessage(new ChatAddMessageIOModel(
                 {
                     _id: this.chat._id,
-                    message: new ChatMessageDataModel(
+                    message: new ChatMessageDataIOModel(
                         {
                             data: this.message,
-                            type: new DivisionSaveModel(
+                            type: new DivisionSaveIOModel(
                                 {
                                     subcode: this.division.SubCode.MessageType.TEXT
                                 })
@@ -95,13 +95,13 @@ class ChatMessageRegistComponent extends FormComponent implements OnInit {
                     type = this.division.SubCode.MessageType.FILE;
                 }
 
-                this.service.addMessage(new ChatAddMessageModel(
+                this.service.addMessage(new ChatAddMessageIOModel(
                     {
                         _id: this.chat._id,
-                        message: new ChatMessageDataModel(
+                        message: new ChatMessageDataIOModel(
                             {
                                 data: data.target.result,
-                                type: new DivisionSaveModel(
+                                type: new DivisionSaveIOModel(
                                     {
                                         subcode: type
                                     }),

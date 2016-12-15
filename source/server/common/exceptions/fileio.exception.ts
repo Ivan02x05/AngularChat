@@ -1,6 +1,6 @@
 import Exception from "./exception";
 import {ErrorConstant} from "../../../common/constants/error.constant";
-import ErrorModel from "../../../common/models/impl/common/error.model";
+import ErrorIOModel from "../../../common/models/io/common/error.io.model";
 
 class FileIOException extends Exception {
     constructor(exception?: any) {

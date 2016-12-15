@@ -1,7 +1,7 @@
 import BaseSchema from "./base.schema";
-import {BaseModel, BaseDocument} from "../models/base.model";
+import {BaseDBModel, BaseDocument} from "../models/base.db.model";
 
-export class DivisionSaveSchema extends BaseSchema<BaseModel<BaseDocument>> {
+export class DivisionSaveSchema extends BaseSchema<BaseDBModel<BaseDocument>> {
     constructor() {
         const schema: Object =
             {

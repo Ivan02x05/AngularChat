@@ -1,16 +1,14 @@
-/// <reference path="../../../typings/tsd.d.ts"/>
-
-import {Mongoose, Connection as MongooseConnection, Model}  from "mongoose";
+import {Mongoose, Connection as MongooseConnection, Model } from "mongoose";
 
 import {lifecycle, LifeCycle} from "../common/container/inject.decorator";
-import {BaseSchema, BaseModel, BaseDocument} from "./schemas/base.schema";
+import {BaseSchema, BaseDBModel, BaseDocument} from "./schemas/base.schema";
 
 var logger = require("../common/utils/log.util").db;
 
 @lifecycle(LifeCycle.Singleton)
 class Connection {
-    private models: Map<BaseSchema<BaseModel<BaseDocument>>, Model<BaseDocument>> =
-    new Map<BaseSchema<BaseModel<BaseDocument>>, Model<BaseDocument>>();
+    private models: Map<BaseSchema<BaseDBModel<BaseDocument>>, Model<BaseDocument>> =
+    new Map<BaseSchema<BaseDBModel<BaseDocument>>, Model<BaseDocument>>();
 
     private instance: Mongoose;
     private database: MongooseConnection;
@@ -27,7 +25,7 @@ class Connection {
         });
     }
 
-    public model<D extends BaseDocument>(schema: BaseSchema<BaseModel<D>>): Model<D> {
+    public model<D extends BaseDocument>(schema: BaseSchema<BaseDBModel<D>>): Model<D> {
         if (!this.models.has(schema))
             this.models.set(schema, this.database.model<D>(schema.getCollectionName(), schema));
 

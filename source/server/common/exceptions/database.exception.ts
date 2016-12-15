@@ -1,15 +1,15 @@
 import Exception from "./exception";
 import {ErrorConstant} from "../../../common/constants/error.constant";
-import ErrorModel from "../../../common/models/impl/common/error.model";
+import ErrorIOModel from "../../../common/models/io/common/error.io.model";
 
 class DataBaseException extends Exception {
-    constructor(exception: Exception | ErrorModel | ErrorModel[] | any) {
+    constructor(exception: Exception | ErrorIOModel | ErrorIOModel[] | any) {
         if (exception instanceof Exception)
             super((<Exception>exception).errors);
-        else if (exception instanceof ErrorModel)
-            super(<ErrorModel>exception);
         else if (Array.isArray(exception))
-            super(<ErrorModel[]>exception);
+            super(<ErrorIOModel[]>exception);
+        else if (exception instanceof ErrorIOModel)
+            super(<ErrorIOModel>exception);
         else {
             super(ErrorConstant.Code.Fatal.DB_QUERY, null, exception);
         }

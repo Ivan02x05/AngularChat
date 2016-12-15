@@ -1,17 +1,15 @@
-/// <reference path="../../../typings/tsd.d.ts"/>
-
 import * as Q from "q";
 import * as path from "path";
 
 import BaseService from "./common/base.service";
 import {service, method} from "./common/service.decorator";
-import UserModel from "../../common/models/impl/common/user.model";
-import UserInfoModel from "../../common/models/impl/common/user.info.model";
-import {ChatModel, ChatJoinModel} from "../../common/models/impl/chat/chat.model";
-import ChatViewedNoModel from "../../common/models/impl/chat/chat.viewedno.model";
-import {ChatMessagesModel, ChatMessageModel, ChatMessageDataModel, ChatAddMessageModel,
-    ChatGetMessageListModel, ChatSearchMessagesModel, ChatGetMessagesMaterialModel}
-from "../../common/models/impl/chat/chat.message.model";
+import UserIOModel from "../../common/models/io/common/user.io.model";
+import UserInfoIOModel from "../../common/models/io/common/user.info.io.model";
+import {ChatIOModel, ChatJoinIOModel} from "../../common/models/io/chat/chat.io.model";
+import ChatViewedNoIOModel from "../../common/models/io/chat/chat.viewedno.io.model";
+import {ChatMessagesIOModel, ChatMessageIOModel, ChatMessageDataIOModel, ChatAddMessageIOModel,
+    ChatGetMessageListIOModel, ChatSearchMessagesIOModel, ChatGetMessagesMaterialIOModel}
+from "../../common/models/io/chat/chat.message.io.model";
 
 import ChatBusiness from "../business/chat.business";
 import ChatViewedNoBusiness from "../business/chat.viewedno.business";
@@ -42,8 +40,8 @@ class ChatService extends BaseService {
         )
             .then(data => {
                 return {
-                    chats: <ChatModel[]>data[0],
-                    viewed: <ChatViewedNoModel>data[1]
+                    chats: <ChatIOModel[]>data[0],
+                    viewed: <ChatViewedNoIOModel>data[1]
                 };
             })
             .then(data => {
@@ -109,7 +107,7 @@ class ChatService extends BaseService {
                     .then(select => {
                         return {
                             all: data.messages,
-                            select: new ChatMessagesModel(select)
+                            select: new ChatMessagesIOModel(select)
                         };
                     })
             })
@@ -125,13 +123,13 @@ class ChatService extends BaseService {
     }
 
     @method()
-    public getMessageList(model: ChatGetMessageListModel): Q.Promise<any> {
+    public getMessageList(model: ChatGetMessageListIOModel): Q.Promise<any> {
         var result = this.result;
         var business = this.getComponent(ChatMessageBusiness);
 
         return this.canViewById(model._id)
             .then(_ => business.findByIdSelectMessages({ id: model._id, skip: model.skip, date: model.date }))
-            .then(_ => new ChatMessagesModel(_))
+            .then(_ => new ChatMessagesIOModel(_))
             .then(_ => {
                 _.unshown = model.skip - _.messages.length;
                 if (_.unshown <= 0)
@@ -144,13 +142,13 @@ class ChatService extends BaseService {
     }
 
     @method()
-    public getMessageDailyList(model: ChatJoinModel): Q.Promise<any> {
+    public getMessageDailyList(model: ChatJoinIOModel): Q.Promise<any> {
         var result = this.result;
         var business = this.getComponent(ChatMessageBusiness);
 
         return this.canViewByCode(model.code)
             .then(_ => business.findByIdGroupByDate(_._id))
-            .then(_ => _.map(__ => new ChatMessagesModel(
+            .then(_ => _.map(__ => new ChatMessagesIOModel(
                 {
                     _id: __._id,
                     unshown: __.count,
@@ -164,7 +162,7 @@ class ChatService extends BaseService {
     }
 
     @method()
-    public regist(model: ChatModel): Q.Promise<any> {
+    public regist(model: ChatIOModel): Q.Promise<any> {
         var result = this.result;
         var chatBusiness = this.getComponent(ChatBusiness);
         var messageBusiness = this.getComponent(ChatMessageBusiness);
@@ -178,7 +176,7 @@ class ChatService extends BaseService {
     }
 
     @method()
-    public update(model: ChatModel): Q.Promise<any> {
+    public update(model: ChatIOModel): Q.Promise<any> {
         var result = this.result;
         var chatBusiness = this.getComponent(ChatBusiness);
         var messageBusiness = this.getComponent(ChatMessageBusiness);
@@ -200,7 +198,7 @@ class ChatService extends BaseService {
     }
 
     @method()
-    public delete(model: ChatModel): Q.Promise<any> {
+    public delete(model: ChatIOModel): Q.Promise<any> {
         var result = this.result;
         var business = this.getComponent(ChatBusiness);
 
@@ -212,7 +210,7 @@ class ChatService extends BaseService {
     }
 
     @method()
-    public close(model: ChatViewedNoModel): Q.Promise<any> {
+    public close(model: ChatViewedNoIOModel): Q.Promise<any> {
         var result = this.result;
         var business = this.getComponent(ChatViewedNoBusiness);
 
@@ -223,7 +221,7 @@ class ChatService extends BaseService {
     }
 
     @method()
-    public addMessage(model: ChatAddMessageModel): Q.Promise<any> {
+    public addMessage(model: ChatAddMessageIOModel): Q.Promise<any> {
         var result = this.result;
         var business = this.getComponent(ChatMessageBusiness);
         var session = this.getComponent(SessionManerger);
@@ -231,10 +229,10 @@ class ChatService extends BaseService {
         return this.canViewById(model._id)
             .then(_ => {
                 return business.addMessage(model._id,
-                    new ChatMessageModel(
+                    new ChatMessageIOModel(
                         {
                             message: model.message,
-                            user: new UserInfoModel(session.session.user)
+                            user: new UserInfoIOModel(session.session.user)
                         }
                     ))
                     .then(__ => {
@@ -260,33 +258,33 @@ class ChatService extends BaseService {
     }
 
     @method()
-    public search(model: ChatSearchMessagesModel): Q.Promise<any> {
+    public search(model: ChatSearchMessagesIOModel): Q.Promise<any> {
         var result = this.result;
         var business = this.getComponent(ChatMessageBusiness);
 
         return this.canViewById(model._id)
             .then(_ => business.findByIdMessageSearch({ id: model._id, condition: model.condition }))
-            .then(_ => new ChatMessagesModel(_))
+            .then(_ => new ChatMessagesIOModel(_))
             .then(_ => {
                 result.add("messages", _);
             });
     }
 
     @method()
-    public download(model: ChatJoinModel): Q.Promise<any> {
+    public download(model: ChatJoinIOModel): Q.Promise<any> {
         var result = this.result;
         var business = this.getComponent(ChatMessageBusiness);
 
         return this.canViewByCode(model.code)
             .then(_ => business.findByIdSelectTextMessages(_._id))
-            .then(_ => new ChatMessagesModel(_))
+            .then(_ => new ChatMessagesIOModel(_))
             .then(_ => {
                 result.add("messages", _);
             });
     }
 
     @method()
-    public getMaterials(model: ChatGetMessagesMaterialModel): Q.Promise<any> {
+    public getMaterials(model: ChatGetMessagesMaterialIOModel): Q.Promise<any> {
         var result = this.result;
 
         return this.canViewByCode(model.code)
@@ -295,48 +293,48 @@ class ChatService extends BaseService {
             });
     }
 
-    private canView(fn: Q.Promise<ChatModel>): Q.Promise<ChatModel> {
+    private canView(fn: Q.Promise<ChatIOModel>): Q.Promise<ChatIOModel> {
         var session = this.getComponent(SessionManerger);
         return fn.then(_ => {
             if (_ == null)
-                return Q.reject<ChatModel>(new Exception(ErrorConstant.Code.Fatal.UN_DEFINED));
+                return Q.reject<ChatIOModel>(new Exception(ErrorConstant.Code.Fatal.UN_DEFINED));
 
             if (!_.canView(session.session.user))
-                return Q.reject<ChatModel>(new Exception(ErrorConstant.Code.Fatal.UN_DEFINED));
+                return Q.reject<ChatIOModel>(new Exception(ErrorConstant.Code.Fatal.UN_DEFINED));
 
             return _;
         });
     }
 
-    private canViewById(id: any): Q.Promise<ChatModel> {
+    private canViewById(id: any): Q.Promise<ChatIOModel> {
         var chatBusiness = this.getComponent(ChatBusiness);
         return this.canView(chatBusiness.findById(id));
     }
 
-    private canViewByCode(code: number): Q.Promise<ChatModel> {
+    private canViewByCode(code: number): Q.Promise<ChatIOModel> {
         var chatBusiness = this.getComponent(ChatBusiness);
         return this.canView(chatBusiness.findByCode(code));
     }
 
-    private canUpdate(fn: Q.Promise<ChatModel>): Q.Promise<ChatModel> {
+    private canUpdate(fn: Q.Promise<ChatIOModel>): Q.Promise<ChatIOModel> {
         var session = this.getComponent(SessionManerger);
         return fn.then(_ => {
             if (_ == null)
-                return Q.reject<ChatModel>(new Exception(ErrorConstant.Code.Fatal.UN_DEFINED));
+                return Q.reject<ChatIOModel>(new Exception(ErrorConstant.Code.Fatal.UN_DEFINED));
 
             if (!_.canUpdate(session.session.user))
-                return Q.reject<ChatModel>(new Exception(ErrorConstant.Code.Fatal.UN_DEFINED));
+                return Q.reject<ChatIOModel>(new Exception(ErrorConstant.Code.Fatal.UN_DEFINED));
 
             return _;
         });
     }
 
-    private canUpdateById(id: any): Q.Promise<ChatModel> {
+    private canUpdateById(id: any): Q.Promise<ChatIOModel> {
         var chatBusiness = this.getComponent(ChatBusiness);
         return this.canUpdate(chatBusiness.findById(id));
     }
 
-    private canUpdateByCode(code: number): Q.Promise<ChatModel> {
+    private canUpdateByCode(code: number): Q.Promise<ChatIOModel> {
         var chatBusiness = this.getComponent(ChatBusiness);
         return this.canUpdate(chatBusiness.findByCode(code));
     }

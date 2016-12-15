@@ -9,7 +9,7 @@
       "commit": "3a86e056dc018541d82dd74639fca18ba8d605da"
     },
     "node/node.d.ts": {
-      "commit": "e937b3e64af586d19f2ea29fdf771e9dc4feecc8"
+      "commit": "bddf14ed27fb8bb3940b54dcf0c57e029206f6a8"
     },
     "express/express.d.ts": {
       "commit": "e937b3e64af586d19f2ea29fdf771e9dc4feecc8"
@@ -49,6 +49,9 @@
     },
     "socket.io-client/socket.io-client.d.ts": {
       "commit": "310c247694d7f31bd2e3198f71c55221f7c3a3c7"
+    },
+    "redis/redis.d.ts": {
+      "commit": "bddf14ed27fb8bb3940b54dcf0c57e029206f6a8"
     }
   }
 }

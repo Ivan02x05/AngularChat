@@ -1,17 +1,15 @@
-/// <reference path="../../../../typings/tsd.d.ts"/>
-
 import {Schema, Types}  from "mongoose";
 
 import BaseSchema from "./base.schema";
 import ChatSchema from "./chat.schema";
 import DivisionSaveSchema from "./division.save.schema";
 import UserInfoSchema from "./user.info.schema";
-import {ChatMessageModel, ChatMessageDocument} from "../models/chat.message.model";
+import {ChatMessageDBModel, ChatMessageDocument} from "../models/chat.message.db.model";
 import {DataBaseConstant} from "../../common/constants/database.constant";
 
-export {ChatMessageModel, ChatMessageDocument};
+export {ChatMessageDBModel, ChatMessageDocument};
 
-export class ChatMessageSchema extends BaseSchema<ChatMessageModel> {
+export class ChatMessageSchema extends BaseSchema<ChatMessageDBModel> {
     constructor() {
         const schema: Object =
             {
@@ -41,7 +39,7 @@ export class ChatMessageSchema extends BaseSchema<ChatMessageModel> {
     }
 
     public getModelType() {
-        return ChatMessageModel;
+        return ChatMessageDBModel;
     }
 }
 

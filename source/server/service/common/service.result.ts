@@ -1,31 +1,28 @@
-import BaseModel from "../../../common/models/impl/common/base.model";
-import ErrorModel from "../../../common/models/impl/common/error.model";
+import BaseIOModel from "../../../common/models/io/common/base.io.model";
+import ErrorIOModel from "../../../common/models/io/common/error.io.model";
 
 class ServiceResult {
     private _models: Map<string, any | any[]> = new Map<string, any | any[]>();
-    private _errors: ErrorModel[] = [];
-
-    constructor() {
-    }
+    private _errors: ErrorIOModel[] = [];
 
     public get models(): Map<string, any | any[]> {
         return this._models;
     }
 
-    public get errors(): ErrorModel[] {
+    public get errors(): ErrorIOModel[] {
         return this._errors;
     }
 
-    public add(key: string | ErrorModel, value: any | any[]) {
-        if (key instanceof ErrorModel) {
-            this._errors.push(<ErrorModel>key);
+    public add(key: string | ErrorIOModel, value: any | any[]) {
+        if (key instanceof ErrorIOModel) {
+            this._errors.push(<ErrorIOModel>key);
         } else {
             if (!this._models.has(<string>key))
                 this._models.set(<string>key, value);
         }
     }
 
-    public remove(key: string | number): any | any[] | ErrorModel {
+    public remove(key: string | number): any | any[] | ErrorIOModel {
         if (typeof (key) == "string") {
             if (this._models.has(<string>key)) {
                 var model = this._models.get(<string>key);
@@ -41,7 +38,7 @@ class ServiceResult {
         }
     }
 
-    public get(key: string | number): any | any[] | ErrorModel {
+    public get(key: string | number): any | any[] | ErrorIOModel {
         if (typeof (key) == "string") {
             if (this._models.has(<string>key))
                 return <any | any[]>this._models.get(<string>key);

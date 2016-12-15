@@ -1,19 +1,21 @@
+import * as Q from "q";
+
 import {Container, LifeCycle, Cache} from "./container";
 import * as decoratorutil from "../utils/decorator.util";
 
 export {LifeCycle, Cache}
 
 export function lifecycle(lifecycle: LifeCycle): Function {
-    function decorator<TFunction extends Function>(target: TFunction): Function {
+    return function <TFunction extends Function>(target: TFunction): Function {
         (<any>target).lifecycle = lifecycle;
         return target;
     }
-
-    return decorator;
 }
 
-export function inject<T extends {}>(injects: { clazz: { new (...args): T }, cache?: Cache, params?: any[] }[]): Function {
-    function decorator(target: { new (...args): T }, name?: string, descriptor?: TypedPropertyDescriptor<Function>): Function | PropertyDescriptor {
+export function inject(injects: { clazz: { new (...args): any }, cache?: Cache, params?: any[], remove?: boolean }[]): Function {
+    function decorator(target: { new (...args): any }, name?: string, descriptor?: TypedPropertyDescriptor<Function>):
+        Function | PropertyDescriptor {
+
         switch (arguments.length) {
             case 1:
                 return classDecorator(target);
@@ -24,10 +26,10 @@ export function inject<T extends {}>(injects: { clazz: { new (...args): T }, cac
         }
     }
 
-    function classDecorator<T extends {}>(target: { new (...args): T }): Function {
+    function classDecorator(target: { new (...args): any }): Function {
         return decoratorutil.createClass({
             target: target,
-            before: (instance: T, params: any[]) => {
+            before: (instance: any, params: any[]) => {
                 for (var i of injects) {
                     var inject: any = Container.resolve(i.clazz, instance, i.params, i.cache);
                     params.push(inject);
@@ -36,22 +38,33 @@ export function inject<T extends {}>(injects: { clazz: { new (...args): T }, cac
         });
     }
 
-    function methodDecorator(target: { new (...args): T }, propertyKey: string | symbol,
+    function methodDecorator(target: { new (...args): any }, propertyKey: string | symbol,
         descriptor: TypedPropertyDescriptor<Function>): TypedPropertyDescriptor<Function> {
 
         const original = descriptor.value;
 
         descriptor.value = function(...args: any[]) {
             var params: any[] = [];
+            var remove: any[] = [];
             args.map((p) => {
                 if (p)
                     params.push(p);
             });
 
-            for (var i of injects)
-                params.push(Container.resolve(i.clazz, this, i.params, i.cache));
+            for (var i of injects) {
+                var instance = Container.resolve(i.clazz, this, i.params, i.cache)
+                params.push(instance);
+                if (i.remove)
+                    remove.push(instance);
+            }
 
-            return original.apply(this, params);
+            return Q.fcall(() => { })
+                .then(() => original.apply(this, params))
+                .finally(() => {
+                    remove.forEach(r => {
+                        Container.remove(null, r);
+                    });
+                });
         };
         return descriptor;
     }

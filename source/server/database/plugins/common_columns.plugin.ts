@@ -1,18 +1,16 @@
-/// <reference path="../../../../typings/tsd.d.ts"/>
-
 import {Schema, Model}  from "mongoose";
 import BaseSchema from "../schemas/base.schema";
 import UserInfoSchema from "../schemas/user.info.schema";
 import BaseDocument from "../documents/base.document";
-import BaseModel from "../models/base.model";
+import BaseDBModel from "../models/base.db.model";
 import {ErrorConstant} from "../../../common/constants/error.constant";
 import SessionManerger from "../../common/manergers/session.manerger";
 import MessageManerger from "../../common/manergers/message.manerger";
 import Container from "../../common/container/container";
 import Exception from "../../common/exceptions/exception";
-import UserInfoModel from "../../../common/models/impl/common/user.info.model";
+import UserInfoIOModel from "../../../common/models/io/common/user.info.io.model";
 
-export = (schema: BaseSchema<BaseModel<BaseDocument>>, options: any = {}) => {
+export = (schema: BaseSchema<BaseDBModel<BaseDocument>>, options: any = {}) => {
     if (!options.nosystem) {
         schema.add({ systemColumn: commonSchema() });
     }
@@ -46,11 +44,11 @@ var preValidate = function(next: Function) {
 }
 
 var setCommonFields = (target: BaseDocument) => {
-    var session: SessionManerger = Container.resolve(SessionManerger, target.creator);
+    var session: SessionManerger = Container.resolve(SessionManerger, target.dbmodel);
 
     if (target.isNew) {
-        target.systemColumn.createUser = new UserInfoModel(session.session.user);
-        target.systemColumn.createDate = BaseModel.sysDate;
+        target.systemColumn.createUser = new UserInfoIOModel(session.session.user);
+        target.systemColumn.createDate = BaseDBModel.sysDate;
         target.systemColumn.version = 0;
     }
 
@@ -59,8 +57,8 @@ var setCommonFields = (target: BaseDocument) => {
         // default is 1
         target.systemColumn.version = 1;
 
-    target.systemColumn.updateUser = new UserInfoModel(session.session.user);
-    target.systemColumn.updateDate = BaseModel.sysDate;
+    target.systemColumn.updateUser = new UserInfoIOModel(session.session.user);
+    target.systemColumn.updateDate = BaseDBModel.sysDate;
 }
 
 function checkVersion(v: number, cb: (result: boolean) => void) {
@@ -70,7 +68,7 @@ function checkVersion(v: number, cb: (result: boolean) => void) {
         return;
     }
 
-    target.creator.findById(target._id).then((document: BaseDocument) => {
+    target.dbmodel.findById(target._id).then((document: BaseDocument) => {
         // ヴァリデーション前処理で1加算してるため、減算し比較する
 
         if (document == null)

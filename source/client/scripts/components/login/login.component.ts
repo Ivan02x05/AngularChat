@@ -5,7 +5,7 @@ import {default as FormComponent, FORM_DIRECTIVES} from "../common/form.componen
 import LoginService from "../../services/login.http.service";
 import UserManerger from "../../manergers/user.manerger";
 import NotificationManerger from "../../manergers/notification.manerger";
-import UserModel from "../../../../common/models/impl/common/user.model";
+import UserIOModel from "../../../../common/models/io/common/user.io.model";
 import {ErrorConstant} from "../../../../common/constants/error.constant";
 import {AppComponent} from "../app.component";
 
@@ -18,7 +18,7 @@ import {AppComponent} from "../app.component";
     templateUrl: "scripts/components/login/login.html"
 })
 class LoginComponent extends FormComponent {
-    private model: UserModel = new UserModel();
+    private model: UserIOModel = new UserIOModel();
     private service: LoginService;
     private router: Router;
     private manerger: UserManerger;
@@ -46,7 +46,7 @@ class LoginComponent extends FormComponent {
                     this.addError(ErrorConstant.Code.Error.FAILURE_LOGIN);
                 else {
                     this.manerger.initialize(
-                        new UserModel(model.models.user));
+                        new UserIOModel(model.models.user));
 
                     this.router.navigate(["Chat"]);
                 }

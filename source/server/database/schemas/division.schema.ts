@@ -1,10 +1,10 @@
 import BaseSchema from "./base.schema";
-import {DivisionModel, DivisionDocument} from "../models/division.model";
+import {DivisionDBModel, DivisionDocument} from "../models/division.db.model";
 import {DataBaseConstant} from "../../common/constants/database.constant";
 
-export {DivisionModel, DivisionDocument};
+export {DivisionDBModel, DivisionDocument};
 
-export class DivisionSchema extends BaseSchema<DivisionModel> {
+export class DivisionSchema extends BaseSchema<DivisionDBModel> {
     constructor() {
         const schema: Object =
             {
@@ -23,7 +23,7 @@ export class DivisionSchema extends BaseSchema<DivisionModel> {
     }
 
     public getModelType() {
-        return DivisionModel;
+        return DivisionDBModel;
     }
 }
 

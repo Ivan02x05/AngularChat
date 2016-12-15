@@ -1,13 +1,15 @@
 import {Input, OnInit, OnDestroy} from  "angular2/core";
 
 import ChatService from "../../services/chat.socket.service";
-import ChatModel from "../../../../common/models/impl/chat/chat.model";
-import {ChatMessagesModel, ChatMessageModel, ChatGetMessageListModel} from "../../../../common/models/impl/chat/chat.message.model";
+import ChatIOModel from "../../../../common/models/io/chat/chat.io.model";
+import {ChatMessagesIOModel, ChatMessageIOModel, ChatGetMessageListIOModel}
+from "../../../../common/models/io/chat/chat.message.io.model";
+
 import * as fileutil from "../../utils/file.util";
 
 abstract class ChatMessageListAbstractComponent implements OnInit, OnDestroy {
-    @Input() protected chat: ChatModel;
-    @Input() protected messages: ChatMessagesModel;
+    @Input() protected chat: ChatIOModel;
+    @Input() protected messages: ChatMessagesIOModel;
 
     protected service: ChatService;
 
@@ -33,7 +35,7 @@ abstract class ChatMessageListAbstractComponent implements OnInit, OnDestroy {
         this.service.onAddMessage = this.chatEvents[0];
     }
 
-    protected onAddMessage(chat: ChatModel, message: ChatMessageModel): boolean {
+    protected onAddMessage(chat: ChatIOModel, message: ChatMessageIOModel): boolean {
         if (this.chat._id == chat._id) {
             this.messages.messages.unshift(message);
             return true;
@@ -42,7 +44,7 @@ abstract class ChatMessageListAbstractComponent implements OnInit, OnDestroy {
             return false;
     }
 
-    public abstract getMessagesList(): ChatMessageModel[];
+    public abstract getMessagesList(): ChatMessageIOModel[];
 }
 
 export default ChatMessageListAbstractComponent;

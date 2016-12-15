@@ -1,17 +1,19 @@
 import * as Q from "q";
 
-import WWWBaseController from "../common/www.base.controller";
-import {controller, method} from "../common/controller.decorator";
+import {WwwBaseController, Container, controller, method} from "../common/www.base.controller";
 import UserService from "../../../service/user.service";
 import ServiceResult from "../../../service/common/service.result";
-import {UserModel, UserGetModel} from "../../../../common/models/impl/common/user.model";
-import UserInfoModel from "../../../../common/models/impl/common/user.info.model";
+import {UserIOModel, UserGetIOModel} from "../../../../common/models/io/common/user.io.model";
+import UserInfoIOModel from "../../../../common/models/io/common/user.info.io.model";
 import TopController from "../socket/top.controller";
+import {ScaleoutClient} from "../../scaleout/client";
+import {SystemConstant} from "../../../common/constants/system.constant";
+import UserScaleoutModel from "../../scaleout/models/common/user.scaleout.model";
 
-@controller
-class UserController extends WWWBaseController {
+@controller()
+class UserController extends WwwBaseController {
 
-    @method({ services: [UserService] })
+    @method()
     protected list(service?: UserService): Q.Promise<void> {
         return service.getList()
             .then((result: ServiceResult) => {
@@ -19,69 +21,74 @@ class UserController extends WWWBaseController {
             });
     }
 
-    @method({ services: [UserService] })
+    @method()
     protected loginedlist(service?: UserService): Q.Promise<void> {
         return service.getList()
             .then((result: ServiceResult) => {
-                var users = <UserInfoModel[]>result.get("users");
-
-                users.forEach(_ => {
-                    _.logined = TopController.sockets.filter(s => s.session.user._id == _._id).length > 0;
-                });
-
-                this.json(result);
+                var users = <UserInfoIOModel[]>result.get("users");
+                var scaleout = Container.resolve(ScaleoutClient);
+                scaleout.get(SystemConstant.Scaleout.Events.Provide.Common.LOGIN_USER)
+                    .then((logins: UserScaleoutModel[]) => logins.map(_ => _.user._id))
+                    .then(logins => {
+                        users.forEach(_ => {
+                            _.logined = logins.filter(l => l == _._id).length > 0;
+                        });
+                    })
+                    .then(() => {
+                        this.json(result);
+                    });
             });
     }
 
-    @method({ model: UserGetModel, services: [UserService] })
-    protected user(model?: UserGetModel, service?: UserService): Q.Promise<void> {
+    @method()
+    protected user(model?: UserGetIOModel, service?: UserService): Q.Promise<void> {
         return service.getUser(model)
             .then((result: ServiceResult) => {
                 this.json(result);
             });
     }
 
-    @method({ model: UserModel, services: [UserService] })
-    protected regist(model?: UserModel, service?: UserService): Q.Promise<void> {
+    @method()
+    protected regist(model?: UserIOModel, service?: UserService): Q.Promise<void> {
         return service.regist(model)
             .then((result: ServiceResult) => {
                 this.json(result);
             });
     }
 
-    @method({ model: UserModel, services: [UserService] })
-    protected update(model?: UserModel, service?: UserService): Q.Promise<void> {
+    @method()
+    protected update(model?: UserIOModel, service?: UserService): Q.Promise<void> {
         return service.update(model)
             .then((result: ServiceResult) => {
-                this.json(result);
+                var user: UserIOModel = <UserIOModel>result.get("user");
+                var scaleout = Container.resolve(ScaleoutClient);
+                if (this.session.user._id == user._id)
+                    this.session.user = user;
 
-                var user: UserModel = <UserModel>result.get("user");
-                TopController.sockets
-                    .filter(_ => _.session.user._id == user._id)
-                    .forEach(_ => {
-                        _.session.user = user;
-                        (<any>_.session).save(() => {
-                            TopController.onChangedSessionSubject.next(user);
-                        });
-                    });
+                scaleout.publish(SystemConstant.Scaleout.Events.Subscribe.Common
+                    .USER_UPDATE, new UserScaleoutModel({
+                        sender: this.session.id,
+                        user: user
+                    }));
+
+                this.json(result);
             });
     }
 
-    @method({ model: UserModel, services: [UserService] })
-    protected delete(model?: UserModel, service?: UserService): Q.Promise<void> {
+    @method()
+    protected delete(model?: UserIOModel, service?: UserService): Q.Promise<void> {
         return service.delete(model)
             .then((result: ServiceResult) => {
-                this.json(result);
+                var user: UserIOModel = <UserIOModel>result.get("user");
+                var scaleout = Container.resolve(ScaleoutClient);
 
-                var user: UserModel = <UserModel>result.get("user");
-                TopController.sockets
-                    .filter(_ => _.session.user._id == user._id)
-                    .forEach(_ => {
-                        (<any>_.session).destroy(() => {
-                            _.emit("logout");
-                            TopController.onChangedSessionSubject.next(user);
-                        });
-                    });
+                scaleout.publish(SystemConstant.Scaleout.Events.Subscribe.Common
+                    .USER_DELETE, new UserScaleoutModel({
+                        sender: this.session.id,
+                        user: user
+                    }));
+
+                this.json(result);
             });
     }
 }
