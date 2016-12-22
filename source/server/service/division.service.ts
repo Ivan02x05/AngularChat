@@ -12,11 +12,11 @@ class DivisionService extends BaseService {
     @method()
     public getList(): Q.Promise<any> {
         return Q.fcall<void>(() => {
-            var result: ServideResult = this.result;
-            var manerger = BaseService.getComponent(DivisionManerger);
+            const result: ServideResult = this.result;
+            const manerger = BaseService.getComponent(DivisionManerger);
 
             // convert
-            var divisions: DivisionIOModel[] = [];
+            const divisions: DivisionIOModel[] = [];
             manerger.divisions.forEach(v1 => {
                 v1.forEach(v2 => {
                     divisions.push(v2);

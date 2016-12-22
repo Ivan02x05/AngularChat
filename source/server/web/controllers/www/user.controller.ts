@@ -3,7 +3,7 @@ import * as Q from "q";
 import {WwwBaseController, Container, controller, method} from "../common/www.base.controller";
 import UserService from "../../../service/user.service";
 import ServiceResult from "../../../service/common/service.result";
-import {UserIOModel, UserGetIOModel} from "../../../../common/models/io/common/user.io.model";
+import {UserIOModel} from "../../../../common/models/io/common/user.io.model";
 import UserInfoIOModel from "../../../../common/models/io/common/user.info.io.model";
 import TopController from "../socket/top.controller";
 import {ScaleoutClient} from "../../scaleout/client";
@@ -25,8 +25,8 @@ class UserController extends WwwBaseController {
     protected loginedlist(service?: UserService): Q.Promise<void> {
         return service.getList()
             .then((result: ServiceResult) => {
-                var users = <UserInfoIOModel[]>result.get("users");
-                var scaleout = Container.resolve(ScaleoutClient);
+                const users = <UserInfoIOModel[]>result.get("users");
+                const scaleout = Container.resolve(ScaleoutClient);
                 scaleout.get(SystemConstant.Scaleout.Events.Provide.Common.LOGIN_USER)
                     .then((logins: UserScaleoutModel[]) => logins.map(_ => _.user._id))
                     .then(logins => {
@@ -41,7 +41,7 @@ class UserController extends WwwBaseController {
     }
 
     @method()
-    protected user(model?: UserGetIOModel, service?: UserService): Q.Promise<void> {
+    protected user(model?: UserIOModel, service?: UserService): Q.Promise<void> {
         return service.getUser(model)
             .then((result: ServiceResult) => {
                 this.json(result);
@@ -60,8 +60,8 @@ class UserController extends WwwBaseController {
     protected update(model?: UserIOModel, service?: UserService): Q.Promise<void> {
         return service.update(model)
             .then((result: ServiceResult) => {
-                var user: UserIOModel = <UserIOModel>result.get("user");
-                var scaleout = Container.resolve(ScaleoutClient);
+                const user: UserIOModel = <UserIOModel>result.get("user");
+                const scaleout = Container.resolve(ScaleoutClient);
                 if (this.session.user._id == user._id)
                     this.session.user = user;
 
@@ -79,8 +79,8 @@ class UserController extends WwwBaseController {
     protected delete(model?: UserIOModel, service?: UserService): Q.Promise<void> {
         return service.delete(model)
             .then((result: ServiceResult) => {
-                var user: UserIOModel = <UserIOModel>result.get("user");
-                var scaleout = Container.resolve(ScaleoutClient);
+                const user: UserIOModel = <UserIOModel>result.get("user");
+                const scaleout = Container.resolve(ScaleoutClient);
 
                 scaleout.publish(SystemConstant.Scaleout.Events.Subscribe.Common
                     .USER_DELETE, new UserScaleoutModel({

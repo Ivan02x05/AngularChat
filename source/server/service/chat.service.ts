@@ -5,7 +5,7 @@ import BaseService from "./common/base.service";
 import {service, method} from "./common/service.decorator";
 import UserIOModel from "../../common/models/io/common/user.io.model";
 import UserInfoIOModel from "../../common/models/io/common/user.info.io.model";
-import {ChatIOModel, ChatJoinIOModel} from "../../common/models/io/chat/chat.io.model";
+import {ChatIOModel} from "../../common/models/io/chat/chat.io.model";
 import ChatViewedNoIOModel from "../../common/models/io/chat/chat.viewedno.io.model";
 import {ChatMessagesIOModel, ChatMessageIOModel, ChatMessageDataIOModel, ChatAddMessageIOModel,
     ChatGetMessageListIOModel, ChatSearchMessagesIOModel, ChatGetMessagesMaterialIOModel}
@@ -19,18 +19,18 @@ import {ErrorConstant} from "../../common/constants/error.constant";
 import Exception from "../common/exceptions/exception";
 import * as fileutil from "../common/utils/file.util";
 
-var config = require("../common/resources/config/www/www.json");
+const config = require("../common/resources/config/www/www.json");
 
 @service
 class ChatService extends BaseService {
 
     @method()
     public getChatList(): Q.Promise<any> {
-        var result = this.result;
-        var chatBusiness = this.getComponent(ChatBusiness);
-        var viewedNoBusiness = this.getComponent(ChatViewedNoBusiness);
-        var messageBusiness = this.getComponent(ChatMessageBusiness);
-        var session = this.getComponent(SessionManerger);
+        const result = this.result;
+        const chatBusiness = this.getComponent(ChatBusiness);
+        const viewedNoBusiness = this.getComponent(ChatViewedNoBusiness);
+        const messageBusiness = this.getComponent(ChatMessageBusiness);
+        const session = this.getComponent(SessionManerger);
 
         return Q.all<any>(
             [
@@ -45,8 +45,8 @@ class ChatService extends BaseService {
                 };
             })
             .then(data => {
-                var chats = data.chats;
-                var viewed = data.viewed;
+                const chats = data.chats;
+                const viewed = data.viewed;
                 result.add("chats", chats);
                 result.add("viewed", viewed);
 
@@ -54,65 +54,55 @@ class ChatService extends BaseService {
                     return;
 
                 return Q.all<void>(chats.map(_ => {
-                    return messageBusiness.findByIdSelectId(_._id)
-                        .then(messages => {
-                            var v = viewed.chats.filter(__ => _._id == __.chatId);
-                            if (v.length == 0)
-                                _.unread = messages.messages.length;
-                            else {
-                                v[0].code = _.code;
-                                var count = 0;
-                                if (!v[0].messageId)
-                                    count = messages.messages.length;
-                                else
-                                    count = messages.indexOf(v[0].messageId);
+                    const v = viewed.chats.filter(__ => __.chatId == _._id);
+                    const cond: any = { chatId: _._id };
+                    if (v.length != 0)
+                        cond.messageId = v[0].messageId;
 
-                                if (count != 0)
-                                    _.unread = count;
-                            }
+                    return messageBusiness.findByIdMessageIndex(cond)
+                        .then(index => index.total - (index.index != null ? (index.index + 1) : 0))
+                        .then(index => (v.length == 0 || index > 0) ? index : null)
+                        .then(index => {
+                            _.unread = index;
                         });
                 }));
             });
     }
 
     @method()
-    public join(model: { code: number, readed?: any }): Q.Promise<any> {
-        var result = this.result;
-        var business = this.getComponent(ChatMessageBusiness);
+    public join(model: { id: number, readed?: any }): Q.Promise<any> {
+        const result = this.result;
+        const business = this.getComponent(ChatMessageBusiness);
 
-        return this.canViewByCode(model.code)
+        return this.canView(model.id)
             .then(_ => {
                 result.add("chat", _);
                 return _;
             })
-            .then(chat => business.findByIdSelectId(chat._id)
-                .then(messages => {
-                    return {
-                        chat: chat,
-                        messages: messages
-                    };
-                }))
+            .then(chat => {
+                return business.findByIdMessageIndex({ chatId: chat._id, messageId: model.readed })
+                    .then(index => {
+                        return {
+                            chat: chat,
+                            index: index
+                        };
+                    })
+            })
             .then(data => {
-                // 未読は全て取得
-                var count;
-                if (!model.readed)
-                    count = data.messages.messages.length;
-                else
-                    count = data.messages.indexOf(model.readed);
-
+                const count = data.index.total - (data.index.index != null ? (data.index.index + 1) : 0);
                 if (count != 0)
                     data.chat.unread = count;
 
                 return business.findByIdSelectMessages({ id: data.chat._id, count: count })
                     .then(select => {
                         return {
-                            all: data.messages,
+                            index: data.index,
                             select: new ChatMessagesIOModel(select)
                         };
                     })
             })
             .then(data => {
-                data.select.unshown = data.all.messages.length - data.select.messages.length;
+                data.select.unshown = data.index.total - data.select.messages.length;
                 if (data.select.unshown <= 0)
                     data.select.unshown = null;
                 return data.select;
@@ -124,10 +114,10 @@ class ChatService extends BaseService {
 
     @method()
     public getMessageList(model: ChatGetMessageListIOModel): Q.Promise<any> {
-        var result = this.result;
-        var business = this.getComponent(ChatMessageBusiness);
+        const result = this.result;
+        const business = this.getComponent(ChatMessageBusiness);
 
-        return this.canViewById(model._id)
+        return this.canView(model._id)
             .then(_ => business.findByIdSelectMessages({ id: model._id, skip: model.skip, date: model.date }))
             .then(_ => new ChatMessagesIOModel(_))
             .then(_ => {
@@ -142,11 +132,11 @@ class ChatService extends BaseService {
     }
 
     @method()
-    public getMessageDailyList(model: ChatJoinIOModel): Q.Promise<any> {
-        var result = this.result;
-        var business = this.getComponent(ChatMessageBusiness);
+    public getMessageDailyList(model: ChatIOModel): Q.Promise<any> {
+        const result = this.result;
+        const business = this.getComponent(ChatMessageBusiness);
 
-        return this.canViewByCode(model.code)
+        return this.canView(model._id)
             .then(_ => business.findByIdGroupByDate(_._id))
             .then(_ => _.map(__ => new ChatMessagesIOModel(
                 {
@@ -163,9 +153,9 @@ class ChatService extends BaseService {
 
     @method()
     public regist(model: ChatIOModel): Q.Promise<any> {
-        var result = this.result;
-        var chatBusiness = this.getComponent(ChatBusiness);
-        var messageBusiness = this.getComponent(ChatMessageBusiness);
+        const result = this.result;
+        const chatBusiness = this.getComponent(ChatBusiness);
+        const messageBusiness = this.getComponent(ChatMessageBusiness);
 
         return chatBusiness.regist(model)
             .then(_ => {
@@ -177,11 +167,11 @@ class ChatService extends BaseService {
 
     @method()
     public update(model: ChatIOModel): Q.Promise<any> {
-        var result = this.result;
-        var chatBusiness = this.getComponent(ChatBusiness);
-        var messageBusiness = this.getComponent(ChatMessageBusiness);
+        const result = this.result;
+        const chatBusiness = this.getComponent(ChatBusiness);
+        const messageBusiness = this.getComponent(ChatMessageBusiness);
 
-        return this.canUpdateById(model._id)
+        return this.canUpdate(model._id)
             .then(_ => {
                 result.add("before", _);
                 return _;
@@ -191,18 +181,18 @@ class ChatService extends BaseService {
                 result.add("after", _);
                 return _;
             })
-            .then(_ => messageBusiness.findByIdSelectId(_._id))
+            .then(_ => messageBusiness.findByIdMessageIndex({ chatId: _._id }))
             .then(_ => {
-                result.add("messages", _);
+                result.add("messages", _.total != null ? _.total : 0);
             });
     }
 
     @method()
     public delete(model: ChatIOModel): Q.Promise<any> {
-        var result = this.result;
-        var business = this.getComponent(ChatBusiness);
+        const result = this.result;
+        const business = this.getComponent(ChatBusiness);
 
-        return this.canUpdateById(model._id)
+        return this.canUpdate(model._id)
             .then(_ => business.delete(_))
             .then(_ => {
                 result.add("chat", _);
@@ -211,8 +201,12 @@ class ChatService extends BaseService {
 
     @method()
     public close(model: ChatViewedNoIOModel): Q.Promise<any> {
-        var result = this.result;
-        var business = this.getComponent(ChatViewedNoBusiness);
+        const result = this.result;
+        const business = this.getComponent(ChatViewedNoBusiness);
+        const session = this.getComponent(SessionManerger);
+
+        if (model._id == null)
+            model._id = session.session.user._id;
 
         return business.save(model)
             .then(_ => {
@@ -222,11 +216,11 @@ class ChatService extends BaseService {
 
     @method()
     public addMessage(model: ChatAddMessageIOModel): Q.Promise<any> {
-        var result = this.result;
-        var business = this.getComponent(ChatMessageBusiness);
-        var session = this.getComponent(SessionManerger);
+        const result = this.result;
+        const business = this.getComponent(ChatMessageBusiness);
+        const session = this.getComponent(SessionManerger);
 
-        return this.canViewById(model._id)
+        return this.canView(model._id)
             .then(_ => {
                 return business.addMessage(model._id,
                     new ChatMessageIOModel(
@@ -251,7 +245,7 @@ class ChatService extends BaseService {
                 if (!_.message.message.isText)
                     return fileutil.writeFileFromBase64Url({
                         url: model.message.data,
-                        path: path.join(config.material.chat.path, _.chat.code.toString()),
+                        path: path.join(config.material.chat.path, _.chat._id),
                         name: _.message.message.data
                     })
             });
@@ -259,10 +253,10 @@ class ChatService extends BaseService {
 
     @method()
     public search(model: ChatSearchMessagesIOModel): Q.Promise<any> {
-        var result = this.result;
-        var business = this.getComponent(ChatMessageBusiness);
+        const result = this.result;
+        const business = this.getComponent(ChatMessageBusiness);
 
-        return this.canViewById(model._id)
+        return this.canView(model._id)
             .then(_ => business.findByIdMessageSearch({ id: model._id, condition: model.condition }))
             .then(_ => new ChatMessagesIOModel(_))
             .then(_ => {
@@ -271,11 +265,11 @@ class ChatService extends BaseService {
     }
 
     @method()
-    public download(model: ChatJoinIOModel): Q.Promise<any> {
-        var result = this.result;
-        var business = this.getComponent(ChatMessageBusiness);
+    public download(model: ChatIOModel): Q.Promise<any> {
+        const result = this.result;
+        const business = this.getComponent(ChatMessageBusiness);
 
-        return this.canViewByCode(model.code)
+        return this.canView(model._id)
             .then(_ => business.findByIdSelectTextMessages(_._id))
             .then(_ => new ChatMessagesIOModel(_))
             .then(_ => {
@@ -285,17 +279,19 @@ class ChatService extends BaseService {
 
     @method()
     public getMaterials(model: ChatGetMessagesMaterialIOModel): Q.Promise<any> {
-        var result = this.result;
+        const result = this.result;
 
-        return this.canViewByCode(model.code)
+        return this.canView(model._id)
             .then(_ => {
-                result.add("file", { path: path.join(config.material.chat.path, model.code.toString()), name: model.file })
+                result.add("file", { path: path.join(config.material.chat.path, model._id), name: model.file })
             });
     }
 
-    private canView(fn: Q.Promise<ChatIOModel>): Q.Promise<ChatIOModel> {
-        var session = this.getComponent(SessionManerger);
-        return fn.then(_ => {
+    private canView(id: any): Q.Promise<ChatIOModel> {
+        const session = this.getComponent(SessionManerger);
+        const chatBusiness = this.getComponent(ChatBusiness);
+
+        return chatBusiness.findById(id).then(_ => {
             if (_ == null)
                 return Q.reject<ChatIOModel>(new Exception(ErrorConstant.Code.Fatal.UN_DEFINED));
 
@@ -306,19 +302,11 @@ class ChatService extends BaseService {
         });
     }
 
-    private canViewById(id: any): Q.Promise<ChatIOModel> {
-        var chatBusiness = this.getComponent(ChatBusiness);
-        return this.canView(chatBusiness.findById(id));
-    }
+    private canUpdate(id: any): Q.Promise<ChatIOModel> {
+        const session = this.getComponent(SessionManerger);
+        const chatBusiness = this.getComponent(ChatBusiness);
 
-    private canViewByCode(code: number): Q.Promise<ChatIOModel> {
-        var chatBusiness = this.getComponent(ChatBusiness);
-        return this.canView(chatBusiness.findByCode(code));
-    }
-
-    private canUpdate(fn: Q.Promise<ChatIOModel>): Q.Promise<ChatIOModel> {
-        var session = this.getComponent(SessionManerger);
-        return fn.then(_ => {
+        return chatBusiness.findById(id).then(_ => {
             if (_ == null)
                 return Q.reject<ChatIOModel>(new Exception(ErrorConstant.Code.Fatal.UN_DEFINED));
 
@@ -327,16 +315,6 @@ class ChatService extends BaseService {
 
             return _;
         });
-    }
-
-    private canUpdateById(id: any): Q.Promise<ChatIOModel> {
-        var chatBusiness = this.getComponent(ChatBusiness);
-        return this.canUpdate(chatBusiness.findById(id));
-    }
-
-    private canUpdateByCode(code: number): Q.Promise<ChatIOModel> {
-        var chatBusiness = this.getComponent(ChatBusiness);
-        return this.canUpdate(chatBusiness.findByCode(code));
     }
 }
 

@@ -35,8 +35,8 @@ class ControlErrorComponent implements OnInit {
             this.formGroup.valid = this.control.valid;
 
         if (this.control.errors) {
-            var errors = <ValidatorResult>this.control.errors;
-            var key = Object.keys(errors)[0];
+            const errors = <ValidatorResult>this.control.errors;
+            const key = Object.keys(errors)[0];
             this.error = errors[key];
         } else
             this.error = null;

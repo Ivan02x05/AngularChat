@@ -9,8 +9,8 @@ export function model<M>() {
         const types = Reflect.getMetadata("design:paramtypes", target, propertyKey);
 
         descriptor.value = function(...args) {
-            var params = [];
-            for (var i = 0, length = args.length; i < length; i++) {
+            const params = [];
+            for (let i = 0, length = args.length; i < length; i++) {
                 if (i == 0 && types.length > 0)
                     params.push(new types[0](args[i]));
                 else
@@ -28,8 +28,8 @@ export function createClass<T>(
         before?: (instance: T, params: any[]) => void,
         after?: (instance: T) => void
     }): Function {
-    var constructor = function(...args) {
-        var params: any[] = [];
+    const constructor = function(...args) {
+        const params: any[] = [];
         args.forEach((p) => {
             if (p)
                 params.push(p);
@@ -45,12 +45,12 @@ export function createClass<T>(
     }
 
     // all fields copy
-    var t: any = options.target;
-    var c: any = constructor;
+    let t: any = options.target;
+    let c: any = constructor;
     while (t && t.prototype && typeof (t) == "function") {
-        for (var prop in t)
+        for (let prop in t)
             c[prop] = t[prop];
-        for (var mthd of Object.getOwnPropertyNames(t)) {
+        for (let mthd of Object.getOwnPropertyNames(t)) {
             if (typeof (t[mthd]) == "function")
                 c[mthd] = t[mthd];
         }

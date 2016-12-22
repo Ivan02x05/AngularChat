@@ -1,9 +1,8 @@
 import * as express from "express";
 import {Store} from "express-session";
-var Session = require("express-session").Session;
 
-var cookie = require("cookie");
-var cookieparser = require("cookie-parser");
+const cookie = require("cookie");
+const cookieparser = require("cookie-parser");
 
 import Exception from "../../common/exceptions/exception";
 import ResponseIOModel from "../../../common/models/io/common/response.io.model";
@@ -12,19 +11,19 @@ import ChatViewedNoIOModel from "../../../common/models/io/chat/chat.viewedno.io
 import {ErrorConstant} from "../../../common/constants/error.constant";
 import errorhandler from "./socket.error.handler";
 
-var config = require("../../common/resources/config/www/www.json");
+const config = require("../../common/resources/config/www/www.json");
 
 export function handshake(socket: SocketIO.Socket,
     store: Store, next: (error?: { data: ResponseIOModel }) => void) {
 
-    var fault = () => {
+    const fault = () => {
         errorhandler(new Exception(ErrorConstant.Code.Fatal.SESSION_TIMEOUT), socket, next);
     };
 
-    var handshake = socket.handshake;
+    const handshake = socket.handshake;
     if (handshake.headers.cookie) {
-        var parsedcookie = cookie.parse(handshake.headers.cookie);
-        var sid = cookieparser.signedCookie(parsedcookie[config.session_name],
+        const parsedcookie = cookie.parse(handshake.headers.cookie);
+        const sid = cookieparser.signedCookie(parsedcookie[config.session_name],
             config.session_secret_key);
 
         (<any>store).get(sid, (error: Error, session) => {

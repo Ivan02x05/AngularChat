@@ -18,12 +18,12 @@ import UserManerger from "./manergers/user.manerger";
 import NotificationManerger from "./manergers/notification.manerger";
 
 // initialize singlton
-var providers: any[] = [
+const providers: any[] = [
     HTTP_PROVIDERS,
     provide(HttpService, { useClass: HttpService })
 ];
 
-var injector = Injector.resolveAndCreate([
+const injector = Injector.resolveAndCreate([
     providers,
     MessageService,
     MessageManerger,
@@ -34,26 +34,29 @@ var injector = Injector.resolveAndCreate([
     NotificationManerger
 ]);
 
-rxjs.Observable.forkJoin([
-    (<MessageManerger>injector.get(MessageManerger)).initialize(),
-    (<DivisionManerger>injector.get(DivisionManerger)).initialize()
-]).map((result) => {
-    return {
-        messageMgr: <MessageManerger>result[0],
-        divisionMgr: <DivisionManerger>result[1]
-    };
-}).subscribe((data) => {
-    bootstrap(AppComponent, [
-        ROUTER_PROVIDERS,
-        providers,
-        provide(LocationStrategy, { useClass: HashLocationStrategy }),
-        provide(OrgExceptionHandler, { useClass: ExceptionHandler }),
-        provide(SocketService, { useClass: SocketService }),
-        provide(MessageManerger, { useValue: data.messageMgr }),
-        provide(DivisionManerger, { useValue: data.divisionMgr }),
-        provide(UserManerger, { useValue: injector.get(UserManerger) }),
-        provide(NotificationManerger, { useValue: injector.get(NotificationManerger) })
-    ]).then((component: ComponentRef) => {
-        InjectManerger.injector = component.injector;
+rxjs.Observable
+    .forkJoin([
+        (<MessageManerger>injector.get(MessageManerger)).initialize(),
+        (<DivisionManerger>injector.get(DivisionManerger)).initialize()
+    ]).map((result) => {
+        return {
+            messageMgr: <MessageManerger>result[0],
+            divisionMgr: <DivisionManerger>result[1]
+        };
+    })
+    .first()
+    .subscribe((data) => {
+        bootstrap(AppComponent, [
+            ROUTER_PROVIDERS,
+            providers,
+            provide(LocationStrategy, { useClass: HashLocationStrategy }),
+            provide(OrgExceptionHandler, { useClass: ExceptionHandler }),
+            provide(SocketService, { useClass: SocketService }),
+            provide(MessageManerger, { useValue: data.messageMgr }),
+            provide(DivisionManerger, { useValue: data.divisionMgr }),
+            provide(UserManerger, { useValue: injector.get(UserManerger) }),
+            provide(NotificationManerger, { useValue: injector.get(NotificationManerger) })
+        ]).then((component: ComponentRef) => {
+            InjectManerger.injector = component.injector;
+        });
     });
-});

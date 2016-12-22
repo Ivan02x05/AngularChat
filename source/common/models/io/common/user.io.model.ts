@@ -43,7 +43,4 @@ export class UserIOModel extends BaseIOModel implements IUserModel {
     }
 }
 
-export class UserGetIOModel extends BaseIOModel {
-}
-
 export default UserIOModel;

@@ -21,7 +21,7 @@ class ChatFilterPipe implements PipeTransform {
             || filters[0] == null)
             return chats;
 
-        var filter = ".*" + filters[0] + ".*";
+        const filter = ".*" + filters[0] + ".*";
         return chats.filter(_ => _.title.match(filter) != null);
     }
 }
@@ -39,7 +39,7 @@ class ChatFilterPipe implements PipeTransform {
         component: ChatNewComponent
     },
     {
-        path: "/:code",
+        path: "/:id",
         name: "Detail",
         component: ChatDetailComponent
     }
@@ -108,7 +108,7 @@ class ChatTopComponent implements OnInit, OnDestroy {
     }
 
     private onRegisted(chat: ChatIOModel) {
-        var original = this.chats.filter(_ => _._id == chat._id);
+        const original = this.chats.filter(_ => _._id == chat._id);
         if (original.length > 0)
             this.select(original[0]);
         else
@@ -118,7 +118,7 @@ class ChatTopComponent implements OnInit, OnDestroy {
     }
 
     private onDelete(chat: ChatIOModel) {
-        var original = this.chats.filter(_ => _._id == chat._id)[0];
+        const original = this.chats.filter(_ => _._id == chat._id)[0];
         this.chats.splice(this.chats.indexOf(original), 1);
         if (original.active)
             this.router.navigate(["Default"]);
@@ -127,8 +127,8 @@ class ChatTopComponent implements OnInit, OnDestroy {
     }
 
     private onUpdate(chat: ChatIOModel) {
-        var original = this.chats.filter(_ => _._id == chat._id)[0];
-        var index = this.chats.indexOf(original);
+        const original = this.chats.filter(_ => _._id == chat._id)[0];
+        const index = this.chats.indexOf(original);
         chat.unread = original.unread;
         chat.active = original.active;
         this.chats[index] = chat;
@@ -140,7 +140,7 @@ class ChatTopComponent implements OnInit, OnDestroy {
     }
 
     private onAddMessage(chat: ChatIOModel, message: ChatMessageIOModel) {
-        var original = this.chats.filter(_ => _._id == chat._id)[0];
+        const original = this.chats.filter(_ => _._id == chat._id)[0];
         if (!original.active)
             if (!original.unread)
                 original.unread = 1;
@@ -162,7 +162,7 @@ class ChatTopComponent implements OnInit, OnDestroy {
         this.clearActive();
         chat.active = true;
         chat.unread = null;
-        this.router.navigate(["Detail", { code: chat.code }]);
+        this.router.navigate(["Detail", { id: chat._id }]);
     }
 
     private onTop() {

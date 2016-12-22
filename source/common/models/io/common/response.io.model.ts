@@ -3,6 +3,8 @@ import ErrorIOModel from "./error.io.model";
 import MessageIOModel from "./message.io.model";
 import {ErrorConstant} from "../../../constants/error.constant";
 
+const NON_ERROR = -1;
+
 export class ResponseIOModel {
     public models: any;
     public errors: ErrorIOModel[];
@@ -18,24 +20,24 @@ export class ResponseIOModel {
                 return b.level - a.level;
             })[0].level;
         } else
-            return -1;
+            return NON_ERROR;
     }
 
     public get hasInfo(): boolean {
-        var level = this.level;
-        return level != -1
+        const level = this.level;
+        return level != NON_ERROR
             && level == ErrorConstant.ErrorLevel.Info;
     }
 
     public get hasWarning(): boolean {
-        var level = this.level;
-        return level != -1
+        const level = this.level;
+        return level != NON_ERROR
             && level == ErrorConstant.ErrorLevel.Warning;
     }
 
     public get hasError(): boolean {
-        var level = this.level;
-        return level != -1
+        const level = this.level;
+        return level != NON_ERROR
             && level >= ErrorConstant.ErrorLevel.Error;
     }
 }

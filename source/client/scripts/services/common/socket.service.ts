@@ -48,7 +48,7 @@ class SocketService {
     }
 
     public on(message: string, event: ON_MESSAGE, link?: Function) {
-        var fn = (data: any) => {
+        const fn = (data: any) => {
             event(new ResponseIOModel(data));
         };
 

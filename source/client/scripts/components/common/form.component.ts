@@ -35,12 +35,12 @@ abstract class FormComponent {
 
     protected addError(value: string | ErrorIOModel | ErrorIOModel[], ...params: string[]) {
         if (Array.isArray(value)) {
-            for (var e of <ErrorIOModel[]>value)
+            for (let e of <ErrorIOModel[]>value)
                 this.errors.push(e);
         } else if (value instanceof ErrorIOModel) {
             this.errors.push(<ErrorIOModel>value);
         } else {
-            var message = this.getMessage(<string>value, params);
+            const message = this.getMessage(<string>value, params);
             this.errors.push(new ErrorIOModel(message.code,
                 message.message, message.level));
         }
@@ -48,7 +48,7 @@ abstract class FormComponent {
     }
 
     protected clearError(): number {
-        var length = this.errors.length;
+        const length = this.errors.length;
         this.errors = [];
         this.emitErrorChanges();
         return length;
@@ -63,8 +63,8 @@ abstract class FormComponent {
     }
 
     protected submit(cb: () => void) {
-        var controls = this.form.controls;
-        for (var c in controls) {
+        const controls = this.form.controls;
+        for (let c in controls) {
             controls[c].updateValueAndValidity();
         }
         setTimeout(() => {

@@ -4,7 +4,7 @@ import {default as SocketBaseController, ON_MESSAGE_MAP, controller, message, sc
 import ChatService from "../../../service/chat.service";
 import ServiceResult from "../../../service/common/service.result";
 import UserIOModel from "../../../../common/models/io/common/user.io.model";
-import {ChatIOModel, ChatJoinIOModel} from "../../../../common/models/io/chat/chat.io.model";
+import {ChatIOModel} from "../../../../common/models/io/chat/chat.io.model";
 import ChatViewedNoIOModel from "../../../../common/models/io/chat/chat.viewedno.io.model";
 import {ChatMessagesIOModel, ChatMessageIOModel, ChatMessageDataIOModel,
     ChatAddMessageIOModel, ChatGetMessageListIOModel, ChatSearchMessagesIOModel}
@@ -17,7 +17,7 @@ import {ChatRegistScaleoutModel, ChatUpdateScaleoutModel, ChatDeleteScaleoutMode
 from "../../scaleout/models/chat/chat.scaleout.model";
 import {ChatMessageAddScaleoutModel} from "../../scaleout/models/chat/chat.message.scaleout.model";
 
-var config = require("../../../common/resources/config/www/www.json");
+const config = require("../../../common/resources/config/www/www.json");
 
 @controller()
 class ChatController extends SocketBaseController {
@@ -120,8 +120,7 @@ class ChatController extends SocketBaseController {
                     new ChatUpdateScaleoutModel({
                         before: result.get("before"),
                         after: result.get("after"),
-                        mIds: <ChatMessagesIOModel>result.get("messages")
-                            .messages.map(_ => _._id)
+                        count: result.get("messages")
                     }));
             });
     }
@@ -130,7 +129,7 @@ class ChatController extends SocketBaseController {
     protected onUpdateSubscribe(model: ChatUpdateScaleoutModel): Q.Promise<void> {
         const emit = (event: string, unread: boolean = false) => {
             if (unread)
-                model.after.unread = this.chatViewedNo.countUnViewed(model.after._id, model.mIds);
+                model.after.unread = model.count;
             this.emit(event, new ResponseIOModel({ models: { chat: model.after }, errors: null }),
                 model.sender == this.socket.id);
         }
@@ -151,8 +150,14 @@ class ChatController extends SocketBaseController {
                 emit("regist", true);
             else if (u)
                 emit("update");
-            else if (d)
+            else if (d) {
                 emit("delete");
+                // 閲覧履歴をクリアする
+                const viewed = this.chatViewedNo.chats.filter(_ => _.chatId == model.after._id);
+                if (viewed.length > 0)
+                    this.chatViewedNo.chats.splice(this.chatViewedNo
+                        .chats.indexOf(viewed[0]), 1);
+            }
         });
     }
 
@@ -176,6 +181,11 @@ class ChatController extends SocketBaseController {
 
                 this.emit("delete", new ResponseIOModel({ models: { chat: model.chat }, errors: null }),
                     model.sender == this.socket.id);
+                // 閲覧履歴をクリアする
+                const viewed = this.chatViewedNo.chats.filter(_ => _.chatId == model.chat._id);
+                if (viewed.length > 0)
+                    this.chatViewedNo.chats.splice(this.chatViewedNo
+                        .chats.indexOf(viewed[0]), 1);
             });
     }
 
@@ -202,10 +212,9 @@ class ChatController extends SocketBaseController {
                     model.sender == this.socket.id);
             })
             .then(() => {
-                var rooms = this.socket.rooms;
-                var code = model.chat.code.toString();
+                const rooms = this.socket.rooms;
                 for (var r in rooms) {
-                    if (rooms[r] == code) {
+                    if (rooms[r] == model.chat._id) {
                         this.chatViewedNo.chats.filter(_ => _.chatId == model.chat._id)[0]
                             .messageId = model.message._id;
                         break;
@@ -223,7 +232,7 @@ class ChatController extends SocketBaseController {
     }
 
     @message()
-    protected onMessageDailyList(model?: ChatJoinIOModel, service?: ChatService): Q.Promise<void> {
+    protected onMessageDailyList(model?: ChatIOModel, service?: ChatService): Q.Promise<void> {
         return service.getMessageDailyList(model)
             .then((result: ServiceResult) => {
                 this.emit("messagedailylist", result);
@@ -231,8 +240,8 @@ class ChatController extends SocketBaseController {
     }
 
     @message()
-    protected onJoin(model?: ChatJoinIOModel, service?: ChatService): Q.Promise<void> {
-        var vieweds = this.chatViewedNo.chats.filter(_ => _.code == model.code);
+    protected onJoin(model?: ChatIOModel, service?: ChatService): Q.Promise<void> {
+        const vieweds = this.chatViewedNo.chats.filter(_ => _.chatId == model._id);
         var viewed;
         var readed: string;
         if (vieweds.length > 0) {
@@ -240,17 +249,17 @@ class ChatController extends SocketBaseController {
             readed = viewed.messageId;
         }
 
-        return service.join({ code: model.code, readed: readed })
+        return service.join({ id: model._id, readed: readed })
             .then((result: ServiceResult) => {
-                return Q.nfcall(this.socket.join.bind(this.socket), model.code.toString())
+                return Q.nfcall(this.socket.join.bind(this.socket), model._id)
                     .then(() => {
                         if (!viewed) {
-                            var chat = <ChatIOModel>result.get("chat");
-                            viewed = { chatId: chat._id, code: model.code };
+                            const chat = <ChatIOModel>result.get("chat");
+                            viewed = { chatId: chat._id };
                             this.chatViewedNo.chats.push(viewed);
                         }
 
-                        var messages = <ChatMessagesIOModel>result.get("messages");
+                        const messages = <ChatMessagesIOModel>result.get("messages");
                         if (messages.messages.length > 0)
                             viewed.messageId = messages.messages[0]._id;
 
@@ -260,8 +269,8 @@ class ChatController extends SocketBaseController {
     }
 
     @message()
-    protected onExit(model?: ChatJoinIOModel): Q.Promise<void> {
-        return Q.nfcall<void>(this.socket.leave.bind(this.socket), model.code.toString());
+    protected onExit(model?: ChatIOModel): Q.Promise<void> {
+        return Q.nfcall<void>(this.socket.leave.bind(this.socket), model._id);
     }
 
     @message()
@@ -273,7 +282,7 @@ class ChatController extends SocketBaseController {
     }
 
     @message()
-    protected onDownload(model?: ChatJoinIOModel, service?: ChatService): Q.Promise<void> {
+    protected onDownload(model?: ChatIOModel, service?: ChatService): Q.Promise<void> {
         return service.download(model)
             .then((result: ServiceResult) => {
                 this.emit("download", result);

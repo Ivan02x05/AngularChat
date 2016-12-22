@@ -13,10 +13,13 @@
     "retry": {
         "chat_message": {
             "count": 10,
-            "second": 3
+            "second": 1
         }
     },
     "select_count" : {
         "chat_message": 20
+    },
+    "max_count": {
+        "chat_message": 100
     }
 }

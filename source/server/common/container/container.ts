@@ -45,11 +45,11 @@ export class Container {
     public static regist(clazz: any, params?: any[]): any {
         if (Container.singleton.has(clazz)) {
             // importすると矛盾参照となる
-            var Exception = require("../exceptions/exception").default;
+            const Exception = require("../exceptions/exception").default;
             throw new Exception(ErrorConstant.Code.Fatal.INSTANCE_DUPLICATE);
         }
 
-        var obj: any = Object.create(clazz.prototype);
+        const obj: any = Object.create(clazz.prototype);
         clazz.apply(obj, params);
         Container.singleton.set(clazz, obj);
         return obj;
@@ -57,7 +57,7 @@ export class Container {
 
     public regist(clazz: any, params?: any[]): any {
         // non check duplicate
-        var obj: any = Object.create(clazz.prototype);
+        const obj: any = Object.create(clazz.prototype);
         obj.container = this;
         clazz.apply(obj, params);
         this.objects.set(clazz, obj);
@@ -67,7 +67,7 @@ export class Container {
     public static registInstance(clazz: any): any {
         if (Container.singleton.has(clazz.constructor)) {
             // importすると矛盾参照となる
-            var Exception = require("../exceptions/exception").default;
+            const Exception = require("../exceptions/exception").default;
             throw new Exception(ErrorConstant.Code.Fatal.INSTANCE_DUPLICATE);
         }
         Container.singleton.set(clazz.constructor, clazz);
@@ -113,7 +113,7 @@ export class Container {
 
     private static delete(target: Map<any, any>, key: any) {
         if (target.has(key)) {
-            var obj = target.get(key);
+            let obj = target.get(key);
             if (obj.dispose)
                 obj.dispose();
             obj = null;
@@ -163,7 +163,7 @@ export class Container {
                     return null;
             }
 
-            var container: Container;
+            let container: Container;
             if (Container.containers.has(host))
                 container = Container.containers.get(host);
             else
@@ -191,7 +191,7 @@ export class Container {
                 return this.host;
             } else {
                 if (this.parent) {
-                    var obj: any = this.parent.resolve(clazz, null, null, false);
+                    const obj: any = this.parent.resolve(clazz, null, null, false);
                     if (obj) {
                         return obj;
                     }

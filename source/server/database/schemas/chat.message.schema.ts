@@ -13,9 +13,12 @@ export class ChatMessageSchema extends BaseSchema<ChatMessageDBModel> {
     constructor() {
         const schema: Object =
             {
-                _id: {
-                    type: Schema.Types.ObjectId, required: true, index: { unique: true },
+                original: {
+                    type: Schema.Types.ObjectId, required: true,
                     ref: BaseSchema.getSchema(ChatSchema).getCollectionName()
+                },
+                seq: {
+                    type: Number, required: true
                 },
                 messages: {
                     type: [{
@@ -31,7 +34,9 @@ export class ChatMessageSchema extends BaseSchema<ChatMessageDBModel> {
                 }
             };
 
-        super(schema, { nosystem: true, "_id": false });
+        super(schema, { nosystem: true });
+
+        this.index({ original: 1, seq: 1 }, { unique: true });
     }
 
     public getCollectionName() {

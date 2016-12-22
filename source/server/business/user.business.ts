@@ -45,7 +45,7 @@ class UserBusiness extends BaseBusiness {
                 if (!result || result.length == 0)
                     return null
                 else {
-                    var user = new UserIOModel(result[0]);
+                    const user = new UserIOModel(result[0]);
                     user.password = security.decryption(user.password);
                     return user;
                 }
@@ -53,7 +53,7 @@ class UserBusiness extends BaseBusiness {
     }
 
     public findByUserIdOtherSelfCount(userId: string, _id?: any): Q.Promise<number> {
-        var cond: any = { userId: userId };
+        const cond: any = { userId: userId };
         if (_id != null)
             cond._id = { "$ne": _id };
 
@@ -63,8 +63,8 @@ class UserBusiness extends BaseBusiness {
     }
 
     public regist(model: UserIOModel): Q.Promise<UserIOModel> {
-        var users = this.database.model(UserSchema);
-        var user = users.toDocument(model);
+        const users = this.database.model(UserSchema);
+        const user = users.toDocument(model);
         user.password = security.encryption(user.password);
 
         return users.save(user)
@@ -76,8 +76,8 @@ class UserBusiness extends BaseBusiness {
     }
 
     public update(model: UserIOModel): Q.Promise<UserIOModel> {
-        var users = this.database.model(UserSchema);
-        var division = this.getComponent(DivisionManerger);
+        const users = this.database.model(UserSchema);
+        const division = this.getComponent(DivisionManerger);
 
         return users.findById(model._id)
             .then(_ => {

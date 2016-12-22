@@ -23,7 +23,7 @@ class ChatMessageListSearchComponent extends ChatMessageListAbstractComponent {
     protected initService() {
         super.initService();
 
-        var index = this.chatEvents.length;
+        const index = this.chatEvents.length;
         this.chatEvents.push(this.onMessageList.bind(this));
         this.service.onMessageList = this.chatEvents[index + 0];
     }

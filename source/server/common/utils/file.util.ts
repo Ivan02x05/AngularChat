@@ -11,7 +11,7 @@ export function exists(p: string): boolean {
 }
 
 export function writeFileFromBase64Url(file: { url: string, path: string, name: string }): Q.Promise<void> {
-    var exec = (): Q.Promise<void> => {
+    const exec = (): Q.Promise<void> => {
         return Q.nfcall<void>(fs.writeFile, path.join(file.path, file.name), fileutil
             .base64Url_to_base64Data(file.url).data, { encoding: "base64" })
             .catch(error => Q.reject<void>(new FileIOException(error)));
@@ -32,7 +32,7 @@ export function readFile(file: { path: string, name: string }): Q.Promise<Buffer
 }
 
 export function mkdir(p: string): Q.Promise<void> {
-    var exec = (): Q.Promise<void> => {
+    const exec = (): Q.Promise<void> => {
         return Q.nfcall<void>(fs.mkdir, p)
             .catch(error => Q.reject<void>(new FileIOException(error)));
     };
@@ -54,4 +54,13 @@ export function mkdir(p: string): Q.Promise<void> {
 
 export function readdirSync(path: string): string[] {
     return fs.readdirSync(path);
+}
+
+export function writeFile(file: { path: string, name: string, data: any }): Q.Promise<void> {
+    const exec = (): Q.Promise<void> => {
+        return Q.nfcall<void>(fs.writeFile, path.join(file.path, file.name), file.data)
+            .catch(error => Q.reject<void>(new FileIOException(error)));
+    };
+    return mkdir(file.path)
+        .then(() => exec());
 }

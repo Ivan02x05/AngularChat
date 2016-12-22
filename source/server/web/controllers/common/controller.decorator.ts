@@ -16,8 +16,8 @@ import {getClassName} from "../../../../common/utils/class.util";
 import {configValidator} from "../../validators/common.validator";
 import Exception from "../../../common/exceptions/exception";
 
-var binder = require("model-binder");
-var logger = require("../../../common/utils/log.util").access;
+const binder = require("model-binder");
+const logger = require("../../../common/utils/log.util").access;
 
 export function controller() {
     return function <T extends BaseController>(target: { new (...args): T }): any {
@@ -35,32 +35,37 @@ export function method<M extends BaseIOModel, S extends BaseService>() {
     return function <T extends WwwBaseController>(
         target: T,
         propertyKey: string | symbol,
-        descriptor: TypedPropertyDescriptor<() => Q.Promise<void>>)
+        descriptor: TypedPropertyDescriptor<(...args) => Q.Promise<void>>)
         : TypedPropertyDescriptor<(model?: M | S) => Q.Promise<void>> {
 
         const original = descriptor.value;
         const types = Reflect.getMetadata("design:paramtypes", target, propertyKey);
 
-        descriptor.value = function() {
+        descriptor.value = function(...args) {
             const controller = getClassName(this);
             const method = (<any>original).name;
+            const params: any[] = [];
+            args.map((p) => {
+                if (p)
+                    params.push(p);
+            });
 
             return Q.fcall(() => { })
                 .then<any[]>(() => {
                     if (types.length == 0 || !(types[0].prototype instanceof BaseIOModel))
-                        return [];
+                        return;
                     else
                         return Q.nfcall(binder(types[0]), this.request, this.response)
                             .then(() => <M>this.request.requestModel)
                             .then(model => {
-                                var errors = validate(controller, method, model);
+                                const errors = validate(controller, method, model);
                                 if (errors == null || errors.length == 0)
-                                    return [model];
+                                    params.push(model);
                                 else
                                     return Q.reject(new Exception(errors));
                             });
                 })
-                .then(params =>
+                .then(() =>
                     Q.all(types
                         .filter(t => t.prototype instanceof BaseService)
                         .map(t => Q.fcall(Container.resolve, t, this, null, Cache.Prototype))
@@ -68,14 +73,11 @@ export function method<M extends BaseIOModel, S extends BaseService>() {
                         services.forEach(s => {
                             params.push(s);
                         });
-                        return params;
                     })
-                ).then(params => {
-                    var model = null;
-                    if (params.length > 0 && params[0] instanceof BaseIOModel)
-                        model = params[0];
+                ).then(() => {
+                    const model = (params.length > 0 && params[0] instanceof BaseIOModel) ? params[0] : null;
+                    const loginInfo = this.session != null ? this.session.user : null;
 
-                    var loginInfo = this.session != null ? this.session.user : null;
                     logger.info("[" + controller + "][" + method + "] start\r\n" +
                         "[session:" + logger.object2String(loginInfo) + "]\r\n" +
                         "[param:" + logger.object2String(model) + "]");
@@ -96,19 +98,19 @@ export function message<M extends BaseIOModel, S extends BaseService>() {
     return function <T extends SocketBaseController>(
         target: T,
         propertyKey: string | symbol,
-        descriptor: TypedPropertyDescriptor<(data: Object) => Q.Promise<void>>)
+        descriptor: TypedPropertyDescriptor<(data?: Object) => Q.Promise<void>>)
         : TypedPropertyDescriptor<ON_MESSAGE> {
 
         const original = descriptor.value;
         const types = Reflect.getMetadata("design:paramtypes", target, propertyKey);
 
-        descriptor.value = function(data: Object) {
+        descriptor.value = function(data?: Object) {
             const controller = getClassName(this);
             const method = (<any>original).name;
 
             return Q.fcall(() => { })
                 .then<any[]>(() => {
-                    if (types.length == 0 || !(types[0].prototype instanceof BaseIOModel))
+                    if (data == null || types.length == 0 || !(types[0].prototype instanceof BaseIOModel))
                         return [];
                     else {
                         var model = new types[0](data);
@@ -164,7 +166,7 @@ export function scaleout<M extends BaseScaleoutModel>() {
         descriptor.value = function(data?: Object) {
             const controller = getClassName(this);
             const method = (<any>original).name;
-            const params = types.length > 0 ? [new types[0](data)] : [];
+            const params = (data != null && types.length > 0) ? [new types[0](data)] : [];
 
             var loginInfo = this.session != null ? this.session.user : null;
             logger.info("[" + controller + "][" + method + "] start\r\n" +

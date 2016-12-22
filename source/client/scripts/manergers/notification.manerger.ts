@@ -17,7 +17,7 @@ class NotificationManerger {
     public notification(title: string, body: string, cb?: () => void) {
         if (!document.hasFocus()) {
             if (!this.manerger.authenticated || !this.manerger.user.isSecret) {
-                var not = new _Notification(title, { body: body, icon: ICON });
+                const not = new _Notification(title, { body: body, icon: ICON });
                 setTimeout(() => {
                     not.close();
                 }, DISPLAY_TIME);

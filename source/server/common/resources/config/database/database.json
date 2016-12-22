@@ -18,5 +18,8 @@
     },
     "select_count" : {
         "chat_message": 20
+    },
+    "max_count": {
+        "chat_message": 100
     }
 }

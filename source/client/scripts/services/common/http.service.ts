@@ -21,7 +21,7 @@ class HttpService {
     }
 
     protected get jsonheaders(): Headers {
-        var headers = this.headers;
+        const headers = this.headers;
         headers.append("Content-Type", "application/json");
         return headers;
     }
@@ -43,7 +43,7 @@ class HttpService {
                 .subscribe(
                 (data) => observer.next(new ResponseIOModel(data)),
                 (error) => {
-                    var json = error.json();
+                    const json = error.json();
                     if (json.errors && Array.isArray(json.errors))
                         throw new Exception(json.errors
                             .map(_ => new ErrorIOModel(_.code, _.message, _.level)));

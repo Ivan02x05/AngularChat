@@ -58,7 +58,7 @@ class TopController extends SocketBaseController {
 
     @message()
     protected onLogout(): Q.Promise<void> {
-        var user = this.session.user;
+        const user = this.session.user;
         return Q.nfcall(this.session.destroy.bind(this.session))
             .then(() => {
                 this.emit("logout");

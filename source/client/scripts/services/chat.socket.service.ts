@@ -1,7 +1,7 @@
 import {Injectable} from  "angular2/core";
 
 import SocketService from "./common/socket.service";
-import {ChatIOModel, ChatJoinIOModel} from "../../../common/models/io/chat/chat.io.model";
+import {ChatIOModel} from "../../../common/models/io/chat/chat.io.model";
 import {ChatMessagesIOModel, ChatMessageIOModel, ChatMessageDataIOModel,
     ChatAddMessageIOModel, ChatGetMessageListIOModel, ChatSearchMessagesIOModel}
 from "../../../common/models/io/chat/chat.message.io.model";
@@ -89,11 +89,11 @@ class ChatService extends SocketService {
         this.emit("chatlist");
     }
 
-    public join(model: ChatJoinIOModel) {
+    public join(model: ChatIOModel) {
         this.emit("join", model);
     }
 
-    public exit(model: ChatJoinIOModel) {
+    public exit(model: ChatIOModel) {
         this.emit("exit", model);
     }
 
@@ -117,7 +117,7 @@ class ChatService extends SocketService {
         this.emit("messagelist", model);
     }
 
-    public getMessageDailyList(model: ChatJoinIOModel) {
+    public getMessageDailyList(model: ChatIOModel) {
         this.emit("messagedailylist", model);
     }
 
@@ -125,7 +125,7 @@ class ChatService extends SocketService {
         this.emit("search", model);
     }
 
-    public download(model: ChatJoinIOModel) {
+    public download(model: ChatIOModel) {
         this.emit("download", model);
     }
 }

@@ -1,21 +1,12 @@
-var log4js = require('log4js');
+const log4js = require('log4js');
 import {inspect} from "util";
 
 import Exception from "../exceptions/exception";
 
 log4js.configure('./bin/server/common/resources/config/log/log.json', { reloadSecs: 60 });
 
-export = {
-    www: log4js.connectLogger(log4js.getLogger("www"), { level: log4js.levels.INFO }),
-    access: logger(log4js.getLogger("access")),
-    error: logger(log4js.getLogger("error")),
-    system: logger(log4js.getLogger("system")),
-    db: logger(log4js.getLogger("db")),
-    levels: log4js.levels
-}
-
-var logger = (logger) => {
-    var object2String = (obj: any) => {
+const logger = (logger) => {
+    const object2String = (obj: any) => {
         return inspect(obj, false, null);
     };
 
@@ -40,4 +31,13 @@ var logger = (logger) => {
         },
         object2String: object2String
     }
+}
+
+export = {
+    www: log4js.connectLogger(log4js.getLogger("www"), { level: log4js.levels.INFO }),
+    access: logger(log4js.getLogger("access")),
+    error: logger(log4js.getLogger("error")),
+    system: logger(log4js.getLogger("system")),
+    db: logger(log4js.getLogger("db")),
+    levels: log4js.levels
 }

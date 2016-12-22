@@ -1,9 +1,8 @@
-
 import {Component, provide, Input, Output, EventEmitter, ViewChild} from  "angular2/core";
 
 import {default as FormComponent, FORM_DIRECTIVES} from "../common/form.component";
 import UserService from "../../services/user.http.service";
-import {UserIOModel as UserIOModelOrg, UserGetIOModel} from "../../../../common/models/io/common/user.io.model";
+import {UserIOModel as UserIOModelOrg} from "../../../../common/models/io/common/user.io.model";
 import ResponseIOModel from "../../../../common/models/io/common/response.io.model";
 import {Observable} from "rxjs/Rx";
 
@@ -38,7 +37,7 @@ class UserEditComponent extends FormComponent {
     private mode: Mode = Mode.Regist;
     private service: UserService;
     private set target(id: string) {
-        var initIOModel = () => {
+        const initIOModel = () => {
             setTimeout(() => {
                 this.model = new UserIOModel({ name: { first: null, last: null } });
                 this.mode = Mode.Regist;
@@ -46,7 +45,7 @@ class UserEditComponent extends FormComponent {
         };
 
         if (id != null) {
-            this.service.getUser(new UserGetIOModel({ _id: id })).subscribe((model) => {
+            this.service.getUser(new UserIOModel({ _id: id })).subscribe((model) => {
                 this.mode = Mode.Update;
                 this.model = new UserIOModel(model.models.user);
 
@@ -96,7 +95,7 @@ class UserEditComponent extends FormComponent {
         this.clearError();
 
         this.submit(() => {
-            var method: (model: UserIOModelOrg) => Observable<ResponseIOModel>;
+            let method: (model: UserIOModelOrg) => Observable<ResponseIOModel>;
             switch (mode) {
                 case Mode.Regist:
                     method = this.service.regist;

@@ -19,7 +19,7 @@ export abstract class BaseController {
     }
 
     protected static resultToIOModel(result: ServiceResult): ResponseIOModel {
-        var model = new ResponseIOModel({ models: {}, errors: result.errors });
+        const model = new ResponseIOModel({ models: {}, errors: result.errors });
         result.models.forEach((v, k) => {
             model.models[k] = v;
         });

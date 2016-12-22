@@ -22,7 +22,7 @@ class ChatMessageListComponent {
     }
 
     private createMaterialsPath(message: ChatMessageDataIOModel): string {
-        return "material/chat/files?code=" + this.chat.code + "&file=" + message.data;
+        return `material/chat/files?_id=${this.chat._id}&file=${message.data}`;
     }
 }
 

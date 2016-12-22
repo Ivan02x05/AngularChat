@@ -16,6 +16,8 @@ export interface IChatMessageModel {
 }
 
 export interface IChatMessagesModel extends IBaseModel {
+    original: any;
+    seq: number;
     messages: IChatMessageModel[];
 }
 

@@ -15,14 +15,14 @@ export class ChatRegistScaleoutModel extends BaseScaleoutModel {
 export class ChatUpdateScaleoutModel extends BaseScaleoutModel {
     public before: ChatIOModel;
     public after: ChatIOModel;
-    public mIds: string[];
+    public count: number;
 
     constructor(obj?: any) {
         super(obj);
 
         BaseIOModel.setValues(this, "before", ChatIOModel, obj);
         BaseIOModel.setValues(this, "after", ChatIOModel, obj);
-        BaseIOModel.setValues(this, "mIds", String, obj, []);
+        BaseIOModel.setValues(this, "count", Number, obj);
     }
 }
 

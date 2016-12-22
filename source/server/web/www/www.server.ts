@@ -6,9 +6,9 @@ import * as bodyparser from "body-parser";
 import * as http from "http";
 import * as path from "path";
 
-var favicon = require("serve-favicon");
-var uuid = require("uuid");
-var redis = require('connect-redis')(session);
+const favicon = require("serve-favicon");
+const uuid = require("uuid");
+const redis = require('connect-redis')(session);
 
 import errorhandler from "../handlers/error.handler";
 import redirecterrorhandler from "../handlers/redirect.error.handler";

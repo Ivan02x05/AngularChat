@@ -1,7 +1,7 @@
 import {Component, provide} from  "angular2/core";
 
 import ChatService from "../../services/chat.socket.service";
-import {ChatIOModel, ChatJoinIOModel} from "../../../../common/models/io/chat/chat.io.model";
+import {ChatIOModel} from "../../../../common/models/io/chat/chat.io.model";
 import {ChatMessagesIOModel, ChatMessageIOModel, ChatGetMessageListIOModel}
 from "../../../../common/models/io/chat/chat.message.io.model";
 
@@ -24,9 +24,9 @@ class ChatMessageListDailyComponent extends ChatMessageListAbstractComponent {
     public ngOnInit() {
         super.ngOnInit();
 
-        this.service.getMessageDailyList(new ChatJoinIOModel(
+        this.service.getMessageDailyList(new ChatIOModel(
             {
-                code: this.chat.code
+                _id: this.chat._id
             }
         ));
     }
@@ -42,8 +42,8 @@ class ChatMessageListDailyComponent extends ChatMessageListAbstractComponent {
         this.messages.unshown = 0;
         this.messages.messages.splice(0, this.messages.messages.length);
 
-        var straight = true;
-        for (var day of this.dailymessages) {
+        let straight = true;
+        for (let day of this.dailymessages) {
             if (straight) {
                 day.messages.forEach(_ => {
                     this.messages.messages.push(_);
@@ -62,7 +62,7 @@ class ChatMessageListDailyComponent extends ChatMessageListAbstractComponent {
     protected initService() {
         super.initService();
 
-        var index = this.chatEvents.length;
+        const index = this.chatEvents.length;
         this.chatEvents.push(this.onMessageDailyList.bind(this));
         this.service.onMessageDailyList = this.chatEvents[index + 0];
         this.chatEvents.push(this.onMessageList.bind(this));
@@ -87,11 +87,11 @@ class ChatMessageListDailyComponent extends ChatMessageListAbstractComponent {
     }
 
     public onMessageDailyList(daily: ChatMessagesIOModel[]) {
-        var count = 0;
+        let count = 0;
         this.dailymessages = daily;
-        for (var day of this.dailymessages) {
+        for (let day of this.dailymessages) {
             while (count < this.messages.messages.length) {
-                var message = this.messages.messages[count];
+                const message = this.messages.messages[count];
                 if (message.message.isUnread
                     || dateutil.equals(day.date, dateutil.toYyyymmdd(message.time))) {
                     day.messages.push(message);
@@ -119,16 +119,16 @@ class ChatMessageListDailyComponent extends ChatMessageListAbstractComponent {
     public onMessageList(messages: ChatMessagesIOModel) {
         this.connecting = false;
 
-        var day = this.dailymessages.filter(_ => dateutil.equals(_.date, dateutil
+        const day = this.dailymessages.filter(_ => dateutil.equals(_.date, dateutil
             .toYyyymmdd(messages.messages[0].time)))[0];
-        for (var message of messages.messages)
+        for (let message of messages.messages)
             day.messages.push(message);
 
         day.unshown = messages.unshown;
     }
 
     public getMessagesList(): ChatMessageIOModel[] {
-        var messages: ChatMessageIOModel[] = [];
+        const messages: ChatMessageIOModel[] = [];
         this.dailymessages.forEach(d => {
             d.messages.forEach(m => {
                 messages.push(m);

@@ -1,7 +1,7 @@
 import {Injectable} from  "angular2/core";
 
 import HttpService from "./common/http.service";
-import {UserIOModel, UserGetIOModel} from "../../../common/models/io/common/user.io.model";
+import {UserIOModel} from "../../../common/models/io/common/user.io.model";
 
 @Injectable()
 class UserService {
@@ -18,7 +18,7 @@ class UserService {
         return this.http.postJson("user/loginedlist");
     }
 
-    public getUser(model: UserGetIOModel) {
+    public getUser(model: UserIOModel) {
         return this.http.postJson("user/user", model);
     }
 

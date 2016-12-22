@@ -23,8 +23,8 @@ const create = (type) => {
 };
 
 if (process.env.NODE_CLUSTER == 1 && cluster.isMaster) {
-    var numCPUs = os.cpus().length;
-    for (var i = 0; i < numCPUs; i++)
+    const numCPUs = os.cpus().length;
+    for (let i = 0; i < numCPUs; i++)
         cluster.fork();
 
     cluster.on("exit", (worker, code, signal) => {
@@ -35,8 +35,8 @@ if (process.env.NODE_CLUSTER == 1 && cluster.isMaster) {
     });
 
     process.on("exit", () => {
-        var workers = cluster.workers;
-        for (var w in workers)
+        const workers = cluster.workers;
+        for (let w in workers)
             workers[w].kill();
     });
 } else {

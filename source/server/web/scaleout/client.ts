@@ -2,7 +2,7 @@ import * as Q from "q";
 import {Subject} from "rxjs/Rx";
 import {RedisClient, createClient as createRedisClient} from "redis";
 
-var uuid = require("uuid");
+const uuid = require("uuid");
 
 import {lifecycle, LifeCycle} from "../../common/container/inject.decorator";
 import BaseScaleoutModel from "./models/common/base.scaleout.model";
@@ -49,7 +49,7 @@ export class ScaleoutClient {
     }
 
     private onMessage(channel: Buffer, data: string) {
-        var c = channel.toString();
+        const c = channel.toString();
         if (this.subscribers.has(c))
             this.subscribers.get(c).next(JSON.parse(data));
     }
@@ -80,7 +80,7 @@ export class ScaleoutClient {
         if (!this.requests.has(model.requestId))
             return;
 
-        var request = this.requests.get(model.requestId);
+        const request = this.requests.get(model.requestId);
         for (var r of model.responses)
             request.responses.push(r);
         request.responsed++;
@@ -100,7 +100,7 @@ export class ScaleoutClient {
                 this.providers.set(channel, []);
             })
             .then(() => {
-                var providers = this.providers.get(channel);
+                const providers = this.providers.get(channel);
                 providers.push(fn);
                 return {
                     cancel: (): Q.Promise<void> => {
@@ -124,8 +124,8 @@ export class ScaleoutClient {
                 return Q.nfcall<void>(this.subscriber.subscribe.bind(this.subscriber), channel);
             })
             .then(() => {
-                var subject = this.subscribers.get(channel);
-                var subscription = subject.subscribe(model => fn(model));
+                const subject = this.subscribers.get(channel);
+                const subscription = subject.subscribe(model => fn(model));
                 return {
                     cancel: (): Q.Promise<void> => {
                         subscription.unsubscribe();
@@ -152,7 +152,7 @@ export class ScaleoutClient {
     public get(channel: string, model?: BaseScaleoutModel): Q.Promise<BaseScaleoutModel[]> {
         return this.numsub
             .then(numsub => {
-                var request = new RequestedScaleoutModel({
+                const request = new RequestedScaleoutModel({
                     sender: process.pid,
                     requestId: uuid.v4(),
                     channel: channel,

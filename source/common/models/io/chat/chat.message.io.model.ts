@@ -54,7 +54,7 @@ export class ChatMessageIOModel extends BaseIOModel implements IChatMessageModel
     }
 
     public get message4notification(): string {
-        var msg: string;
+        let msg: string;
         if (this.message.isText)
             msg = this.message.data;
         else
@@ -64,6 +64,8 @@ export class ChatMessageIOModel extends BaseIOModel implements IChatMessageModel
 }
 
 export class ChatMessagesIOModel extends BaseIOModel implements IChatMessagesModel {
+    public original: any;
+    public seq: number;
     public messages: ChatMessageIOModel[];
     public unshown: number;
     public date: Date;
@@ -71,6 +73,8 @@ export class ChatMessagesIOModel extends BaseIOModel implements IChatMessagesMod
     constructor(obj?: any) {
         super(obj);
 
+        this.setValues("original", String, obj);
+        this.setValues("seq", Number, obj);
         this.setValues("messages", ChatMessageIOModel, obj, []);
         this.setValues("unshown", Number, obj);
         this.setValues("date", Date, obj);
@@ -80,8 +84,8 @@ export class ChatMessagesIOModel extends BaseIOModel implements IChatMessagesMod
         if (!id)
             return null;
 
-        var index = 0;
-        for (var msg of this.messages) {
+        let index = 0;
+        for (let msg of this.messages) {
             if (msg._id == id)
                 break;
             index++;
@@ -124,13 +128,11 @@ export class ChatSearchMessagesIOModel extends BaseIOModel {
 }
 
 export class ChatGetMessagesMaterialIOModel extends BaseIOModel {
-    public code: number;
     public file: string;
 
     constructor(obj?: any) {
         super(obj);
 
-        this.setValues("code", Number, obj);
         this.setValues("file", String, obj);
     }
 }

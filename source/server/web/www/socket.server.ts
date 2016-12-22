@@ -1,7 +1,7 @@
 import * as socketio from "socket.io";
 import * as path from "path";
 
-var adapter = require("socket.io-redis");
+const adapter = require("socket.io-redis");
 
 import {inject, lifecycle, LifeCycle} from "../../common/container/inject.decorator";
 import {handshake} from "../handlers/session.handler";

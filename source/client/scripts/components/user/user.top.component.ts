@@ -22,7 +22,7 @@ class UserFilterPipe implements PipeTransform {
             || filters[0] == null)
             return users;
 
-        var filter = ".*" + filters[0] + ".*";
+        const filter = ".*" + filters[0] + ".*";
         return users.filter(_ => _.fullname.match(filter) != null);
     }
 }
@@ -83,7 +83,7 @@ class UserTopComponent implements OnInit {
     }
 
     private onChange(info: { mode: Mode, model: UserIOModel }) {
-        var model = new UserInfoIOModel(info.model);
+        const model = new UserInfoIOModel(info.model);
         model.active = true;
 
         switch (info.mode) {

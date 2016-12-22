@@ -2,7 +2,7 @@ import * as express from "express";
 import * as Q from "q";
 import * as mime from "mime";
 
-var requestInject = require("express"),
+const requestInject = require("express"),
     request = requestInject.request.constructor,
     response = requestInject.response.constructor;
 

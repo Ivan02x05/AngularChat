@@ -14,7 +14,7 @@ export abstract class BaseSchema<M extends BaseDBModel<BaseDocument>> extends Sc
 
         this.options = options;
 
-        var name = this.getCollectionName();
+        const name = this.getCollectionName();
         if (name != null)
             this.set("collection", name);
     }
@@ -25,8 +25,8 @@ export abstract class BaseSchema<M extends BaseDBModel<BaseDocument>> extends Sc
     public static getSchema<S extends BaseSchema<M>, M extends BaseDBModel<D>, D extends BaseDocument>(
         schema: { new (): BaseSchema<M> }): S {
 
-        var exists = Container.exists(schema);
-        var sch = <S>Container.resolve(schema);
+        const exists = Container.exists(schema);
+        const sch = <S>Container.resolve(schema);
         if (!exists && sch.get("collection") != null)
             sch.plugin(require("../plugins/common_columns.plugin"), sch.options);
 

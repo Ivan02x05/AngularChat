@@ -2,7 +2,7 @@ import {Component, provide, OnInit, OnDestroy, ViewChild, ElementRef} from  "ang
 import {RouteParams} from  "angular2/router";
 
 import ChatService from "../../services/chat.socket.service";
-import {ChatIOModel, ChatJoinIOModel} from "../../../../common/models/io/chat/chat.io.model";
+import {ChatIOModel} from "../../../../common/models/io/chat/chat.io.model";
 import ErrorIOModel from "../../../../common/models/io/common/error.io.model";
 import DivisionSaveIOModel from "../../../../common/models/io/common/division.save.io.model";
 import {default as ChatMessagesIOModel, ChatMessageIOModel, ChatMessageDataIOModel}
@@ -39,7 +39,7 @@ enum Mode {
 })
 class ChatDetailComponent implements OnInit, OnDestroy {
     private element: ElementRef;
-    private code: number;
+    private id: string;
     private chat: ChatIOModel;
     private messages: ChatMessagesIOModel;
     private service: ChatService;
@@ -59,23 +59,23 @@ class ChatDetailComponent implements OnInit, OnDestroy {
 
         this.service = service;
         this.manerger = manerger;
-        this.code = Number(routeParams.get("code"));
+        this.id = routeParams.get("id");
         this.element = element;
     }
 
     public ngOnInit() {
         this.initService();
-        this.service.join(new ChatJoinIOModel(
+        this.service.join(new ChatIOModel(
             {
-                code: this.code
+                _id: this.id
             }
         ));
     }
 
     public ngOnDestroy() {
-        this.service.exit(new ChatJoinIOModel(
+        this.service.exit(new ChatIOModel(
             {
-                code: this.code
+                _id: this.id
             }
         ));
         this.chatEvents.forEach(_ => {
@@ -113,9 +113,9 @@ class ChatDetailComponent implements OnInit, OnDestroy {
 
             setTimeout(() => {
                 // set scroll position
-                var el = this.element.nativeElement;
-                var list = el.querySelector(".chat-message-list");
-                var unread = el.querySelector(".unread");
+                const el = this.element.nativeElement;
+                const list = el.querySelector(".chat-message-list");
+                const unread = el.querySelector(".unread");
                 list.scrollTop = unread.offsetTop - list.offsetHeight + unread.scrollHeight;
             }, 0);
         }
@@ -142,30 +142,30 @@ class ChatDetailComponent implements OnInit, OnDestroy {
     }
 
     private onDownloadDisped() {
-        var anchor = this.downloadBtn.nativeElement;
+        const anchor = this.downloadBtn.nativeElement;
         anchor.href = this.createCsvFile(this.outputCmpl.getMessagesList());
         anchor.click();
     }
 
     private onDownloadAll() {
         this.downloading = true;
-        this.service.download(new ChatJoinIOModel(
+        this.service.download(new ChatIOModel(
             {
-                code: this.chat.code
+                _id: this.id
             }
         ));
     }
 
     private onDownload(model: ChatMessagesIOModel) {
         this.downloading = true;
-        var anchor = this.downloadBtn.nativeElement;
+        const anchor = this.downloadBtn.nativeElement;
         anchor.href = this.createCsvFile(model.messages);
         anchor.click();
     }
 
     private onDownloadCommon() {
         setTimeout(() => {
-            var anchor = this.downloadBtn.nativeElement;
+            const anchor = this.downloadBtn.nativeElement;
             fileutil.deleteObjectUrl(anchor.href);
             anchor.href = "#";
             this.downloading = false;
@@ -173,11 +173,11 @@ class ChatDetailComponent implements OnInit, OnDestroy {
     }
 
     private createCsvFile(messages: ChatMessageIOModel[]): string {
-        var data: any[][] = [];
-        data.push(["コード", "タイトル", "公開範囲", "対象者", "種別", "メッセージ", "登録者", "日時"]);
+        const data: any[][] = [];
+        data.push(["ID", "タイトル", "公開範囲", "対象者", "種別", "メッセージ", "登録者", "日時"]);
         messages.forEach(_ => {
             data.push([
-                this.chat.code,
+                this.chat._id,
                 this.chat.title,
                 this.chat.permission.value,
                 this.chat.permission.subcode == CodeConstant.Division.SubCode.AccessPermission.ALL ?

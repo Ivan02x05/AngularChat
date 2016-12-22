@@ -26,13 +26,13 @@ export abstract class BaseDBModel<D extends BaseDocument> {
             return Q.reject(error);
         else if (error.errors) {
             // validate error
-            var validateErrors: ErrorIOModel[] = []
-            for (var key in error.errors) {
-                var error = error.errors[key];
-                if (error.properties
-                    && error.properties.error
-                    && error.properties.error instanceof Exception) {
-                    (<Exception>error.properties.error).errors
+            const validateErrors: ErrorIOModel[] = []
+            for (let key in error.errors) {
+                let e = error.errors[key];
+                if (e.properties
+                    && e.properties.error
+                    && e.properties.error instanceof Exception) {
+                    (<Exception>e.properties.error).errors
                         .forEach(_ => {
                             validateErrors.push(_);
                         });
@@ -99,9 +99,9 @@ export abstract class BaseDBModel<D extends BaseDocument> {
 
     public toDocument<T extends IBaseModel>(data?: T): D {
         // clone for delete _id field
-        var clone = Object.assign({}, data);
+        const clone = Object.assign({}, data);
         delete clone._id;
-        var document: D = new this.model(clone);
+        const document: D = new this.model(clone);
         document.dbmodel = this;
         return document;
     }

@@ -24,13 +24,13 @@ export function justlength(value: any, length: number, name: string): ErrorIOMod
 }
 
 function createError(code: string, ...params: string[]): ErrorIOModel {
-    var manerger: MessageManerger = Container.resolve(MessageManerger);
-    var message = manerger.getMessage(code, params);
+    const manerger = <MessageManerger>Container.resolve(MessageManerger);
+    const message = manerger.getMessage(code, params);
     return new ErrorIOModel(message.code, message.message, message.level)
 }
 
 export function configValidator(config: any, target: any): ErrorIOModel[] {
-    var errors: ErrorIOModel[] = [];
+    const errors: ErrorIOModel[] = [];
 
     if (!config)
         return null;

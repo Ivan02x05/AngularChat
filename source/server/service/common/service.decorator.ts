@@ -6,8 +6,6 @@ import BaseServide from "./base.service";
 import ServideResult from "./service.result";
 import DataBase from "../../database/database";
 
-var binder = require("model-binder");
-
 export function service<T extends BaseServide>(target: { new (...args): T }): any {
     return decoratorutil.createClass({
         target: target,
@@ -19,7 +17,7 @@ export function service<T extends BaseServide>(target: { new (...args): T }): an
 }
 
 export function method() {
-    return function methodDecorator<T extends BaseServide>(
+    return function <T extends BaseServide>(
         target: T,
         propertyKey: string | symbol,
         descriptor: TypedPropertyDescriptor<(...args) => Q.Promise<any>>)
@@ -29,7 +27,7 @@ export function method() {
 
         descriptor.value = function(...args: any[]) {
             // regist service result
-            var result: ServideResult = Container.resolve(ServideResult, this, null, Cache.Prototype);
+            const result: ServideResult = Container.resolve(ServideResult, this, null, Cache.Prototype);
             return original.apply(this, args)
                 .then(() => result);
         };

@@ -46,8 +46,8 @@ export namespace ErrorConstant {
         if (code == null || code.length < 1)
             return null;
 
-        var c: string = code.substring(0, 1);
-        var error: ErrorLevel;
+        const c: string = code.substring(0, 1);
+        let error: ErrorLevel;
         switch (c) {
             case Code.Prefix.INFO:
                 error = ErrorLevel.Info;

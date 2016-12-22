@@ -12,7 +12,7 @@ export class ChatSchema extends BaseSchema<ChatDBModel> {
     constructor() {
         const schema: Object =
             {
-                code: { type: Number, required: true, index: { unique: true } },
+                _id: { type: Schema.Types.ObjectId, required: true, index: { unique: true } },
                 title: { type: String, required: true, maxlength: 20 },
                 permission: { type: BaseSchema.getSchema(DivisionSaveSchema), required: true },
                 users: {
@@ -20,7 +20,7 @@ export class ChatSchema extends BaseSchema<ChatDBModel> {
                 }
             };
 
-        super(schema);
+        super(schema, { "_id": false });
     }
 
     public getCollectionName() {

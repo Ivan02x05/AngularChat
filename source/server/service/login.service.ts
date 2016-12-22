@@ -13,8 +13,8 @@ class LoginService extends BaseService {
 
     @method()
     public login(model: UserIOModel): Q.Promise<any> {
-        var result = this.result;
-        var business = this.getComponent(UserBusiness);
+        const result = this.result;
+        const business = this.getComponent(UserBusiness);
 
         return business.findByUserId(model.userId)
             .then((search) => {

@@ -6,7 +6,7 @@ import DefaultConnection from "./default.connection";
 
 @inject([{ clazz: DefaultConnection }])
 export class DataBase {
-    public connection: Connection;
+    private connection: Connection;
 
     constructor(connection?: Connection) {
         this.connection = connection;
@@ -15,7 +15,7 @@ export class DataBase {
     public model<S extends BaseSchema<M>, M extends BaseDBModel<D>, D extends BaseDocument>(
         schema: { new (): BaseSchema<M> }): M {
 
-        var sch = BaseSchema.getSchema(schema);
+        const sch = BaseSchema.getSchema(schema);
         return Container.resolve(sch.getModelType(), this, [this.connection.model(sch)]);
     }
 }

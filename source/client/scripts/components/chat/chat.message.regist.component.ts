@@ -83,10 +83,10 @@ class ChatMessageRegistComponent extends FormComponent implements OnInit {
 
         this.clearError();
 
-        var exec = (file: any) => {
-            var reader = new FileReader();
+        const exec = (file: any) => {
+            const reader = new FileReader();
             reader.onload = (data: any) => {
-                var type: string;
+                let type: string;
                 if (file.type.match(/image.*/)) {
                     type = this.division.SubCode.MessageType.IMAGE;
                 } else if (file.type.match(/video.*/)) {
@@ -114,8 +114,8 @@ class ChatMessageRegistComponent extends FormComponent implements OnInit {
             reader.readAsDataURL(file);
         };
 
-        var files = event.dataTransfer.files;
-        for (var i = 0; i < files.length; i++)
+        const files = event.dataTransfer.files;
+        for (let i = 0; i < files.length; i++)
             exec(files[i]);
     }
 

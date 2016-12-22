@@ -18,14 +18,14 @@ import SessionManerger from "../../../common/manergers/session.manerger";
 import {ScaleoutClient, Cancelable} from "../../scaleout/client";
 import {SystemConstant} from "../../../common/constants/system.constant";
 
-var socketio = require("socket.io/lib/socket");
+const socketio = require("socket.io/lib/socket");
 
 export type ON_MESSAGE = <M extends BaseIOModel, S extends BaseServide>
 (model?: M, ...services: S[]) => Q.Promise<void>;
 
 export type ON_MESSAGE_MAP = { [key: string]: ON_MESSAGE };
 
-var config = require("../../../common/resources/config/www/www.json");
+const config = require("../../../common/resources/config/www/www.json");
 
 @inject([{ clazz: socketio }, { clazz: ScaleoutClient }])
 export abstract class SocketBaseController extends BaseController {
@@ -108,7 +108,7 @@ export abstract class SocketBaseController extends BaseController {
     }
 
     protected onSessionTimeout(): Q.Promise<void> {
-        var close = () => {
+        const close = () => {
             return Q.nfcall<Error>(authhandler, this.socket.request, null)
                 .then(error => this.onError(error))
                 .then(() => this.onDisconnect())
@@ -167,7 +167,7 @@ export abstract class SocketBaseController extends BaseController {
     }
 
     protected unsubscribeAll(): Q.Promise<void> {
-        var unsubscribers = [];
+        const unsubscribers = [];
         this.unsubscribers.forEach((v, k) => {
             unsubscribers.push(k);
         });
@@ -181,7 +181,7 @@ export abstract class SocketBaseController extends BaseController {
                 if (!flag)
                     return;
 
-                var unsubscriber = this.unsubscribers.get(channel);
+                const unsubscriber = this.unsubscribers.get(channel);
                 this.unsubscribers.delete(channel);
                 return unsubscriber.cancel();
             });
@@ -200,14 +200,14 @@ export abstract class SocketBaseController extends BaseController {
                 if (!flag)
                     return;
 
-                var unprovider = this.unproviders.get(channel);
+                const unprovider = this.unproviders.get(channel);
                 this.unproviders.delete(channel);
                 return unprovider.cancel();
             });
     }
 
     protected unprovideAll(): Q.Promise<void> {
-        var unproviders = [];
+        const unproviders = [];
         this.unproviders.forEach((v, k) => {
             unproviders.push(k);
         });

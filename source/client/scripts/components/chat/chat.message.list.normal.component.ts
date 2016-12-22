@@ -21,7 +21,7 @@ class ChatMessageListNormalComponent extends ChatMessageListAbstractComponent {
     protected initService() {
         super.initService();
 
-        var index = this.chatEvents.length;
+        const index = this.chatEvents.length;
         this.chatEvents.push(this.onMessageList.bind(this));
         this.service.onMessageList = this.chatEvents[index + 0];
     }
@@ -37,7 +37,7 @@ class ChatMessageListNormalComponent extends ChatMessageListAbstractComponent {
     }
 
     private onMessageList(messages: ChatMessagesIOModel) {
-        for (var m of messages.messages)
+        for (let m of messages.messages)
             this.messages.messages.push(m);
 
         this.messages.unshown = messages.unshown;

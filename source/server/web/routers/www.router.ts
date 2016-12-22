@@ -6,7 +6,7 @@ import jsonerrorhandler from "../handlers/json.error.handler";
 import redirecterrorhandler from "../handlers/redirect.error.handler";
 import authhandler from "../handlers/auth.handler";
 
-var router: express.Router = express.Router();
+const router: express.Router = express.Router();
 
 router.get("/", function(req: express.Request
     , res: express.Response, next: Function) {

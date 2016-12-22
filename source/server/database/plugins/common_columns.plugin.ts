@@ -17,7 +17,7 @@ export = (schema: BaseSchema<BaseDBModel<BaseDocument>>, options: any = {}) => {
     schema.pre("validate", preValidate);
 };
 
-var commonSchema = function(): Object {
+const commonSchema = function(): Object {
     return {
         deleteFlag: { type: Boolean, default: false, required: true },
         version: {
@@ -34,8 +34,8 @@ var commonSchema = function(): Object {
     };
 }
 
-var preValidate = function(next: Function) {
-    var self: BaseDocument = <BaseDocument>this;
+const preValidate = function(next: Function) {
+    const self: BaseDocument = <BaseDocument>this;
 
     if ((<any>self.schema).tree.systemColumn) {
         setCommonFields(self)
@@ -43,8 +43,9 @@ var preValidate = function(next: Function) {
     next();
 }
 
-var setCommonFields = (target: BaseDocument) => {
-    var session: SessionManerger = Container.resolve(SessionManerger, target.dbmodel);
+const setCommonFields = (target: BaseDocument) => {
+    const session: SessionManerger = Container
+        .resolve(SessionManerger, target.dbmodel);
 
     if (target.isNew) {
         target.systemColumn.createUser = new UserInfoIOModel(session.session.user);
@@ -62,7 +63,7 @@ var setCommonFields = (target: BaseDocument) => {
 }
 
 function checkVersion(v: number, cb: (result: boolean) => void) {
-    var target: BaseDocument = <BaseDocument>this;
+    const target: BaseDocument = <BaseDocument>this;
     if (target.isNew) {
         cb(true);
         return;

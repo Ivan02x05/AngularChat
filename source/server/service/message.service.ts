@@ -12,12 +12,12 @@ class MessageService extends BaseService {
     @method()
     public getList(): Q.Promise<any> {
         return Q.fcall<void>(() => {
-            var result: ServideResult = this.result;
-            var manerger: MessageManerger = BaseService
+            const result: ServideResult = this.result;
+            const manerger: MessageManerger = BaseService
                 .getComponent(MessageManerger);
 
             // convert
-            var messages: MessageIOModel[] = [];
+            const messages: MessageIOModel[] = [];
             manerger.messages.forEach((v, k) => {
                 messages.push(v);
             });

@@ -2,7 +2,7 @@ import * as Q from "q";
 
 import BaseService from "./common/base.service";
 import {service, method} from "./common/service.decorator";
-import {UserIOModel, UserGetIOModel} from "../../common/models/io/common/user.io.model";
+import {UserIOModel} from "../../common/models/io/common/user.io.model";
 import UserInfoIOModel from "../../common/models/io/common/user.info.io.model";
 import UserBusiness from "../business/user.business";
 import SessionManerger from "../common/manergers/session.manerger";
@@ -14,8 +14,8 @@ class UserService extends BaseService {
 
     @method()
     public getList(): Q.Promise<any> {
-        var result = this.result;
-        var business = this.getComponent(UserBusiness);
+        const result = this.result;
+        const business = this.getComponent(UserBusiness);
 
         return business.getList()
             .then(_ => {
@@ -24,10 +24,10 @@ class UserService extends BaseService {
     }
 
     @method()
-    public getUser(model: UserGetIOModel): Q.Promise<any> {
-        var result = this.result;
-        var business = this.getComponent(UserBusiness);
-        var session = this.getComponent(SessionManerger);
+    public getUser(model: UserIOModel): Q.Promise<any> {
+        const result = this.result;
+        const business = this.getComponent(UserBusiness);
+        const session = this.getComponent(SessionManerger);
 
         return business.findById(model._id)
             .then(_ => {
@@ -44,9 +44,9 @@ class UserService extends BaseService {
 
     @method()
     public regist(model: UserIOModel): Q.Promise<any> {
-        var result = this.result;
-        var business = this.getComponent(UserBusiness);
-        var session = this.getComponent(SessionManerger);
+        const result = this.result;
+        const business = this.getComponent(UserBusiness);
+        const session = this.getComponent(SessionManerger);
 
         if (!session.session.user.isAdmin)
             return Q.reject(new Exception(ErrorConstant.Code.Fatal.UN_DEFINED));
@@ -69,9 +69,9 @@ class UserService extends BaseService {
 
     @method()
     public update(model: UserIOModel): Q.Promise<any> {
-        var result = this.result;
-        var business = this.getComponent(UserBusiness);
-        var session = this.getComponent(SessionManerger);
+        const result = this.result;
+        const business = this.getComponent(UserBusiness);
+        const session = this.getComponent(SessionManerger);
 
         return business.findById(model._id)
             .then<UserIOModel>(_ => {
@@ -106,9 +106,9 @@ class UserService extends BaseService {
 
     @method()
     public delete(model: UserIOModel): Q.Promise<any> {
-        var result = this.result;
-        var business = this.getComponent(UserBusiness);
-        var session = this.getComponent(SessionManerger);
+        const result = this.result;
+        const business = this.getComponent(UserBusiness);
+        const session = this.getComponent(SessionManerger);
 
         if (!session.session.user.isAdmin
             || session.session.user._id == model._id)

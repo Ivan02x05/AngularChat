@@ -6,7 +6,6 @@ import DivisionSaveIOModel from "../common/division.save.io.model";
 import {CodeConstant} from "../../../constants/code.constant";
 
 export class ChatIOModel extends BaseIOModel implements IChatModel {
-    public code: number;
     public title: string;
     public permission: DivisionSaveIOModel;
     public users: UserInfoIOModel[];
@@ -16,7 +15,6 @@ export class ChatIOModel extends BaseIOModel implements IChatModel {
     constructor(obj?: any) {
         super(obj);
 
-        this.setValues("code", Number, obj);
         this.setValues("title", String, obj);
         this.setValues("permission", DivisionSaveIOModel, obj);
         this.setValues("users", UserInfoIOModel, obj);
@@ -34,16 +32,6 @@ export class ChatIOModel extends BaseIOModel implements IChatModel {
         return user.isAdmin
             || (this.systemColumn.createUser._id == user._id
                 && this.canView(user));
-    }
-}
-
-export class ChatJoinIOModel extends BaseIOModel {
-    public code: number;
-
-    constructor(obj?: any) {
-        super(obj);
-
-        this.setValues("code", Number, obj);
     }
 }
 

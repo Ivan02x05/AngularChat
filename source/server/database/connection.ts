@@ -3,7 +3,7 @@ import {Mongoose, Connection as MongooseConnection, Model } from "mongoose";
 import {lifecycle, LifeCycle} from "../common/container/inject.decorator";
 import {BaseSchema, BaseDBModel, BaseDocument} from "./schemas/base.schema";
 
-var logger = require("../common/utils/log.util").db;
+const logger = require("../common/utils/log.util").db;
 
 @lifecycle(LifeCycle.Singleton)
 class Connection {

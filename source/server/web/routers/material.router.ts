@@ -5,7 +5,7 @@ import errorhandler from "../handlers/error.handler";
 import materialerrorhandler from "../handlers/material.error.handler";
 import authhandler from "../handlers/auth.handler";
 
-var router: express.Router = express.Router();
+const router: express.Router = express.Router();
 
 router.get("/:controller/:method", authhandler, function(req: express.Request
     , res: express.Response, next: (error?: Error) => void) {

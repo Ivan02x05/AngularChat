@@ -28,11 +28,11 @@ class MessageManerger {
     public getMessage(code: string, args?: string[]): MessageIOModel {
         if (this.messages.has(code)) {
             // clone
-            var message: MessageIOModel = <MessageIOModel>Object
+            const message: MessageIOModel = <MessageIOModel>Object
                 .assign({}, this.messages.get(code));
 
             if (args) {
-                for (var i = 0; i < args.length; i++) {
+                for (let i = 0; i < args.length; i++) {
                     message.message = message.message
                         .replace("{" + i + "}", args[i]);
                 }

@@ -25,7 +25,7 @@ class ServiceResult {
     public remove(key: string | number): any | any[] | ErrorIOModel {
         if (typeof (key) == "string") {
             if (this._models.has(<string>key)) {
-                var model = this._models.get(<string>key);
+                const model = this._models.get(<string>key);
                 this._models.delete(<string>key);
 
                 return model;

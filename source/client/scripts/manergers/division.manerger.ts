@@ -42,7 +42,7 @@ class DivisionManerger {
     }
 
     public getValue(code: string, subcode: string): string {
-        var division = this.getDivision(code, subcode);
+        const division = this.getDivision(code, subcode);
         if (division != null)
             return division.value;
         else
@@ -50,7 +50,7 @@ class DivisionManerger {
     }
 
     public getDivisions(code: string): DivisionIOModel[] {
-        var divisions: DivisionIOModel[] = [];
+        const divisions: DivisionIOModel[] = [];
         if (this.divisions.has(code)) {
             this.divisions.get(code)
                 .forEach(v => {

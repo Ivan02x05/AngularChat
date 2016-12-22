@@ -15,10 +15,10 @@ abstract class AbstractException extends Error {
     protected abstract getManerger(): { getMessage: (code: string, args?: string[]) => MessageIOModel };
 
     private createError(value: string, params?: string[]): ErrorIOModel {
-        var error: ErrorIOModel;
+        let error: ErrorIOModel;
         try {
             // MessageManerger作成で失敗した場合、エラーを発生させない
-            var model: MessageIOModel = this.getManerger().getMessage(value, params);
+            const model: MessageIOModel = this.getManerger().getMessage(value, params);
             error = new ErrorIOModel(model.code, model.message, model.level);
         } catch (error) {
             error = new ErrorIOModel(ErrorConstant.Code.Fatal.UN_DEFINED,
@@ -48,7 +48,7 @@ abstract class AbstractException extends Error {
     }
 
     public get message(): string {
-        var message: string = "";
+        let message: string = "";
         this.errors.forEach(_ => {
             message += _.message + "\r\n";
         });

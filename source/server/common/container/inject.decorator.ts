@@ -30,8 +30,8 @@ export function inject(injects: { clazz: { new (...args): any }, cache?: Cache, 
         return decoratorutil.createClass({
             target: target,
             before: (instance: any, params: any[]) => {
-                for (var i of injects) {
-                    var inject: any = Container.resolve(i.clazz, instance, i.params, i.cache);
+                for (let i of injects) {
+                    const inject: any = Container.resolve(i.clazz, instance, i.params, i.cache);
                     params.push(inject);
                 }
             }
@@ -44,18 +44,18 @@ export function inject(injects: { clazz: { new (...args): any }, cache?: Cache, 
         const original = descriptor.value;
 
         descriptor.value = function(...args: any[]) {
-            var params: any[] = [];
-            var remove: any[] = [];
+            const params: any[] = [];
+            const remove: any[] = [];
             args.map((p) => {
                 if (p)
                     params.push(p);
             });
 
-            for (var i of injects) {
-                var instance = Container.resolve(i.clazz, this, i.params, i.cache)
-                params.push(instance);
+            for (let i of injects) {
+                const inject = Container.resolve(i.clazz, this, i.params, i.cache)
+                params.push(inject);
                 if (i.remove)
-                    remove.push(instance);
+                    remove.push(inject);
             }
 
             return Q.fcall(() => { })

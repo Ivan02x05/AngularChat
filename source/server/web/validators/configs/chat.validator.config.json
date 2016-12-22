@@ -103,16 +103,16 @@
         }
     },
     "onJoin":{
-        "code": {
-            "name":"コード",
+        "_id": {
+            "name":"ID",
             "validators":{
                 "required":""
             }
         }
     },
     "onExit":{
-        "code": {
-            "name":"コード",
+        "_id": {
+            "name":"ID",
             "validators":{
                 "required":""
             }
@@ -135,16 +135,16 @@
         }
     },
     "onMessageDailyList":{
-        "code": {
-            "name":"コード",
+        "_id": {
+            "name":"ID",
             "validators":{
                 "required":""
             }
         }
     },
     "files":{
-        "code": {
-            "name":"コード",
+        "_id": {
+            "name":"ID",
             "validators":{
                 "required":""
             }

@@ -22,8 +22,8 @@ export abstract class ValidatorBase implements Validator {
     abstract validateControl(control: AbstractControl);
 
     protected add(code: string, ...params: string[]) {
-        var manerger: MessageManerger = InjectManerger.injector.get(MessageManerger);
-        var message = manerger.getMessage(code, params);
+        const manerger: MessageManerger = InjectManerger.injector.get(MessageManerger);
+        const message = manerger.getMessage(code, params);
         this.result[code] = new ErrorIOModel(message.code,
             message.message, message.level);
     }

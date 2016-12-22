@@ -8,7 +8,7 @@ import {ErrorConstant} from "../../../common/constants/error.constant";
 export default function handle(error: Exception, req: express.Request,
     res: express.Response, next: (error?: Error) => void) {
 
-    var model: ResponseIOModel = new ResponseIOModel();
+    const model = new ResponseIOModel();
     model.errors = error.errors;
 
     if (error.level > ErrorConstant.ErrorLevel.Error)

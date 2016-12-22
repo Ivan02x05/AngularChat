@@ -5,40 +5,125 @@ import ChatMessageSchema from "../database/schemas/chat.message.schema";
 import {default as ChatMessagesIOModel, ChatMessageIOModel, ChatMessageDataIOModel}
 from "../../common/models/io/chat/chat.message.io.model";
 
-import SessionManerger from "../common/manergers/session.manerger";
 import DivisionManerger from "../common/manergers/division.manerger";
 import * as dateutil from "../../common/utils/date.util";
 import {regexp} from "../../common/utils/string.util";
 import {CodeConstant} from "../../common/constants/code.constant";
 
-var config = require("../common/resources/config/database/database.json");
+const config = require("../common/resources/config/database/database.json");
 
 class ChatMessageBusiness extends BaseBusiness {
 
-    public findById(id: any, fields?: Object): Q.Promise<ChatMessagesIOModel> {
+    public findByIdMaxSeq(id: any): Q.Promise<{ seq: number, count: number }> {
         return this.database.model(ChatMessageSchema)
-            .findById(id, fields)
-            .then(result => new ChatMessagesIOModel(result))
+            .find({ original: id }, { seq: 1, "messages._id": 1 }, { sort: { seq: -1 }, limit: 1 })
+            .then(result => result.length > 0 ? result[0] : { seq: 0, messages: [] })
             .then(result => {
-                result.messages = result.messages.reverse();
-                return result;
+                return {
+                    seq: result.seq,
+                    count: result.messages.length
+                };
             });
     }
 
-    public findByIdSelectId(id: any): Q.Promise<ChatMessagesIOModel> {
-        return this.findById(id, "_id messages._id");
+    public findByIdMessageIndex(cond: { chatId: any, messageId?: any }): Q.Promise<{ total: number, index: number }> {
+        const messages = this.database.model(ChatMessageSchema);
+        const pipeline: any = [
+            {
+                $match:
+                {
+                    original: messages.toObjectId(cond.chatId)
+                }
+            },
+            {
+                $unwind:
+                {
+                    path: "$messages",
+                    includeArrayIndex: "index"
+                }
+            },
+            {
+                $project:
+                {
+                    seq: 1,
+                    index: 1,
+                    "messages._id": 1
+                }
+            },
+            {
+                $sort:
+                {
+                    seq: 1,
+                    index: 1
+                }
+            },
+            {
+                $group:
+                {
+                    _id: null,
+                    "messages": { $push: "$messages" }
+                }
+            }
+        ];
+        let project: any =
+            {
+                $project:
+                {
+                    total: { $size: "$messages" }
+                }
+            };
+
+        pipeline.push(project);
+
+        if (cond.messageId != null) {
+            project["$project"]["messages._id"] = 1;
+
+            pipeline.push(
+                {
+                    $unwind:
+                    {
+                        path: "$messages",
+                        includeArrayIndex: "index"
+                    }
+                },
+                {
+                    $match:
+                    {
+                        "messages._id": messages.toObjectId(cond.messageId)
+                    }
+                },
+                {
+                    $group:
+                    {
+                        _id: null,
+                        index: { $first: "$index" },
+                        total: { $first: "$total" }
+                    }
+                }
+            );
+        }
+
+        return messages
+            .aggregate(pipeline)
+            .then((result: any) => result.length > 0 ? result[0] : { index: null, total: null })
+            .then(result => {
+                return {
+                    index: result.index,
+                    total: result.total
+                };
+            });
     }
 
     public findByIdSelectMessages(cond: { id: any, count?: number, skip?: number, date?: Date }):
         Q.Promise<{ _id: any, messages: ChatMessageIOModel[] }> {
 
-        var messages = this.database.model(ChatMessageSchema);
-        var pipeline: any =
+        const messages = this.database.model(ChatMessageSchema);
+        const pipeline: any =
             [
                 {
                     $match:
                     {
-                        _id: messages.toObjectId(cond.id)
+                        original: messages.toObjectId(cond.id)
                     }
                 },
                 {
@@ -68,8 +153,8 @@ class ChatMessageBusiness extends BaseBusiness {
             cond.count = config.select_count.chat_message;
 
         if (cond.skip) {
-            var skip = cond.skip - cond.count;
-            var count = cond.count;
+            let skip = cond.skip - cond.count;
+            let count = cond.count;
             if (skip <= 0) {
                 skip = 0;
                 count = cond.skip;
@@ -84,6 +169,7 @@ class ChatMessageBusiness extends BaseBusiness {
                 {
                     $sort:
                     {
+                        "seq": -1,
                         "index": -1
                     }
                 }
@@ -94,6 +180,7 @@ class ChatMessageBusiness extends BaseBusiness {
                 {
                     $sort:
                     {
+                        "seq": -1,
                         "index": -1
                     }
                 },
@@ -106,7 +193,7 @@ class ChatMessageBusiness extends BaseBusiness {
             {
                 $group:
                 {
-                    _id: "$_id",
+                    _id: "$original",
                     messages: { $push: "$messages" }
                 }
             }
@@ -124,7 +211,7 @@ class ChatMessageBusiness extends BaseBusiness {
     }
 
     public findByIdGroupByDate(id: any): Q.Promise<{ _id: any, date: Date, count: number }[]> {
-        var messages = this.database.model(ChatMessageSchema);
+        const messages = this.database.model(ChatMessageSchema);
 
         return messages
             .aggregate(
@@ -132,7 +219,7 @@ class ChatMessageBusiness extends BaseBusiness {
                 {
                     $match:
                     {
-                        _id: messages.toObjectId(id)
+                        original: messages.toObjectId(id)
                     }
                 },
                 {
@@ -177,16 +264,17 @@ class ChatMessageBusiness extends BaseBusiness {
             });
     }
 
-    public findByIdMessageSearch(cond: { id: any, condition: string }): Q.Promise<{ _id: any, messages: ChatMessageIOModel[] }> {
+    public findByIdMessageSearch(cond: { id: any, condition: string }):
+        Q.Promise<{ _id: any, messages: ChatMessageIOModel[] }> {
 
-        var messages = this.database.model(ChatMessageSchema);
+        const messages = this.database.model(ChatMessageSchema);
         const condition = new RegExp(regexp.escape(cond.condition), "i");
-        var pipeline: any =
+        const pipeline: any =
             [
                 {
                     $match:
                     {
-                        _id: messages.toObjectId(cond.id)
+                        original: messages.toObjectId(cond.id)
                     }
                 },
                 {
@@ -218,13 +306,14 @@ class ChatMessageBusiness extends BaseBusiness {
                 {
                     $sort:
                     {
+                        "seq": -1,
                         "index": -1
                     }
                 },
                 {
                     $group:
                     {
-                        _id: "$_id",
+                        _id: "$original",
                         messages: { $push: "$messages" }
                     }
                 }
@@ -242,13 +331,13 @@ class ChatMessageBusiness extends BaseBusiness {
     }
 
     public findByIdSelectTextMessages(id: any): Q.Promise<{ _id: any, messages: ChatMessageIOModel[] }> {
-        var messages = this.database.model(ChatMessageSchema);
-        var pipeline: any =
+        const messages = this.database.model(ChatMessageSchema);
+        const pipeline: any =
             [
                 {
                     $match:
                     {
-                        _id: messages.toObjectId(id)
+                        original: messages.toObjectId(id)
                     }
                 },
                 {
@@ -286,13 +375,14 @@ class ChatMessageBusiness extends BaseBusiness {
                 {
                     $sort:
                     {
+                        "seq": -1,
                         "index": -1
                     }
                 },
                 {
                     $group:
                     {
-                        _id: "$_id",
+                        _id: "$original",
                         messages: { $push: "$messages" }
                     }
                 }
@@ -309,36 +399,55 @@ class ChatMessageBusiness extends BaseBusiness {
             });
     }
 
-    public regist(id: any): Q.Promise<ChatMessagesIOModel> {
-        var messages = this.database.model(ChatMessageSchema);
-        var message = messages.toDocument({
-            _id: null,
-            messages: []
-        });
-        // 生成時にIDがクリアされるため、ここで再設定する
-        message._id = id;
+    public regist(id: any, seq?: number): Q.Promise<ChatMessagesIOModel> {
+        const messages = this.database.model(ChatMessageSchema);
 
-        return messages.save(message)
+        return Q.fcall(() => { })
+            .then(() => {
+                if (seq == null)
+                    return this.findByIdMaxSeq(id)
+                        .then(model => model.seq + 1);
+                else
+                    return seq;
+            })
+            .then(seq => messages
+                .toDocument(
+                new ChatMessagesIOModel({
+                    original: id,
+                    seq: seq,
+                    messages: []
+                }))
+            )
+            .then(message => messages.save(message))
             .then(result => new ChatMessagesIOModel(result));
     }
 
     public addMessage(id: any, message: ChatMessageIOModel):
         Q.Promise<ChatMessageIOModel> {
 
-        var messages = this.database.model(ChatMessageSchema);
-        var exec = (retry: number): Q.Promise<ChatMessageIOModel> => {
-            // modelのメソッド等が含まれるとエラーになるため、db用のオブジェクトに変換
-            var dbobject = message.dbobject;
-            dbobject._id = messages.id;
-            dbobject.time = messages.sysDate;
-            dbobject.message.type.value = this.getComponent(DivisionManerger)
-                .getValue(
-                CodeConstant.Division.Code.MESSAGE_TYPE,
-                dbobject.message.type.subcode);
-            if (!message.message.isText)
-                dbobject.message.data = dbobject._id + "." + dbobject.message.title.split(".")[1];
+        const messages = this.database.model(ChatMessageSchema);
 
-            return messages.findByIdAndUpdate({ _id: id }, { $push: { messages: dbobject } })
+        // modelのメソッド等が含まれるとエラーになるため、db用のオブジェクトに変換
+        const dbobject = message.dbobject;
+        dbobject._id = messages.id;
+        dbobject.time = messages.sysDate;
+        dbobject.message.type.value = this.getComponent(DivisionManerger)
+            .getValue(
+            CodeConstant.Division.Code.MESSAGE_TYPE,
+            dbobject.message.type.subcode);
+        if (!message.message.isText)
+            dbobject.message.data = dbobject._id + "." + dbobject.message.title.split(".")[1];
+
+        const exec = (retry: number): Q.Promise<ChatMessageIOModel> => {
+            return this.findByIdMaxSeq(id)
+                .then(seq => {
+                    if (seq.count >= config.max_count.chat_message)
+                        return this.regist(id, seq.seq + 1)
+                            .then(result => result.seq);
+                    else
+                        return seq.seq;
+                })
+                .then(seq => messages.findOneAndUpdate({ original: id, seq: seq }, { $push: { messages: dbobject } }))
                 .then(() => new ChatMessageIOModel(dbobject))
                 .catch<ChatMessageIOModel>(_ => {
                     if (retry < config.retry.chat_message.count)
