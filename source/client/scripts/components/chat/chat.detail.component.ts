@@ -1,17 +1,16 @@
-import {Component, provide, OnInit, OnDestroy, ViewChild, ElementRef} from  "angular2/core";
+import {Component, OnInit, OnDestroy, ViewChild, ElementRef} from  "angular2/core";
+
 import {RouteParams} from  "angular2/router";
 
 import ChatService from "../../services/chat.socket.service";
 import {ChatIOModel} from "../../../../common/models/io/chat/chat.io.model";
-import ErrorIOModel from "../../../../common/models/io/common/error.io.model";
 import DivisionSaveIOModel from "../../../../common/models/io/common/division.save.io.model";
-import {default as ChatMessagesIOModel, ChatMessageIOModel, ChatMessageDataIOModel}
+import {ChatMessagesIOModel, ChatMessageIOModel, ChatMessageDataIOModel}
 from "../../../../common/models/io/chat/chat.message.io.model";
 
 import ChatEditComponent from "./chat.edit.component";
 import ChatMessageRegistComponent from "./chat.message.regist.component";
 import ChatMessageSearchComponent from "./chat.message.search.component";
-import ChatMessageListAbstractComponent from "./chat.message.list.abstract.component";
 import ChatMessageListNormalComponent from "./chat.message.list.normal.component";
 import ChatMessageListDailyComponent from "./chat.message.list.daily.component";
 import ChatMessageListSearchComponent from "./chat.message.list.search.component";
@@ -38,20 +37,21 @@ enum Mode {
     templateUrl: "scripts/components/chat/chat.detail.html"
 })
 class ChatDetailComponent implements OnInit, OnDestroy {
-    private element: ElementRef;
     private id: string;
     private chat: ChatIOModel;
     private messages: ChatMessagesIOModel;
     private service: ChatService;
     private manerger: MessageManerger;
+
+    private element: ElementRef;
+    private mode: Mode = Mode.Normal;
+
     private toggled: boolean = true;
     private modes = Mode;
-    private mode: Mode = Mode.Normal;
     private chatEvents = [];
-    protected downloading: boolean = false;
 
     @ViewChild("inputCmp") private inputCmp: { hasError: boolean };
-    @ViewChild("outputCmpl") private outputCmpl: ChatMessageListAbstractComponent;
+    @ViewChild("outputCmpl") private outputCmpl: { getDispMessage(): ChatMessageIOModel[] };
     @ViewChild("downloadBtn") private downloadBtn: ElementRef;
 
     constructor(service: ChatService, manerger: MessageManerger,
@@ -90,6 +90,12 @@ class ChatDetailComponent implements OnInit, OnDestroy {
         this.service.onUpdated = this.chatEvents[1];
         this.chatEvents.push(this.onDownload.bind(this));
         this.service.onDownload = this.chatEvents[2];
+        this.chatEvents.push(this.onAddMessage.bind(this));
+        this.service.onAddMessageRoom = this.chatEvents[3];
+    }
+
+    private onAddMessage(message: ChatMessageIOModel) {
+        this.messages.messages.unshift(message);
     }
 
     private onJoin(chat: ChatIOModel, messages: ChatMessagesIOModel) {
@@ -121,6 +127,13 @@ class ChatDetailComponent implements OnInit, OnDestroy {
         }
     }
 
+    private onPushMessage(messages: ChatMessagesIOModel) {
+        for (let message of messages.messages) {
+            this.messages.messages.push(message);
+            this.messages.unshown--;
+        }
+    }
+
     private onUpdated(chat: ChatIOModel) {
         this.toggled = true;
         this.chat = chat;
@@ -143,12 +156,11 @@ class ChatDetailComponent implements OnInit, OnDestroy {
 
     private onDownloadDisped() {
         const anchor = this.downloadBtn.nativeElement;
-        anchor.href = this.createCsvFile(this.outputCmpl.getMessagesList());
+        anchor.href = this.createCsvFile(this.outputCmpl.getDispMessage());
         anchor.click();
     }
 
     private onDownloadAll() {
-        this.downloading = true;
         this.service.download(new ChatIOModel(
             {
                 _id: this.id
@@ -157,7 +169,6 @@ class ChatDetailComponent implements OnInit, OnDestroy {
     }
 
     private onDownload(model: ChatMessagesIOModel) {
-        this.downloading = true;
         const anchor = this.downloadBtn.nativeElement;
         anchor.href = this.createCsvFile(model.messages);
         anchor.click();
@@ -168,7 +179,6 @@ class ChatDetailComponent implements OnInit, OnDestroy {
             const anchor = this.downloadBtn.nativeElement;
             fileutil.deleteObjectUrl(anchor.href);
             anchor.href = "#";
-            this.downloading = false;
         }, 0);
     }
 

@@ -36,21 +36,21 @@ class LoginComponent extends FormComponent {
     }
 
     private login() {
-        this.clearError();
+        this.submit(() => {
+            this.service.login(this.model)
+                .subscribe((model) => {
+                    if (model.hasError)
+                        this.addError(model.errors);
+                    else if (!model.models.user)
+                        this.addError(ErrorConstant.Code.Error.FAILURE_LOGIN);
+                    else {
+                        this.manerger.initialize(
+                            new UserIOModel(model.models.user));
 
-        this.service.login(this.model)
-            .subscribe((model) => {
-                if (model.hasError)
-                    this.addError(model.errors);
-                else if (!model.models.user)
-                    this.addError(ErrorConstant.Code.Error.FAILURE_LOGIN);
-                else {
-                    this.manerger.initialize(
-                        new UserIOModel(model.models.user));
-
-                    this.router.navigate(["Chat"]);
-                }
-            });
+                        this.router.navigate(["Chat"]);
+                    }
+                });
+        });
     }
 }
 

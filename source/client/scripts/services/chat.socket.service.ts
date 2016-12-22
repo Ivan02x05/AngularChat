@@ -59,6 +59,12 @@ class ChatService extends SocketService {
         }, cb);
     }
 
+    public set onAddMessageRoom(cb: (message: ChatMessageIOModel) => void) {
+        this.on("addmessageroom", (response) => {
+            cb(new ChatMessageIOModel(response.models.message));
+        }, cb);
+    }
+
     public set onJoin(cb: (chat: ChatIOModel, messages: ChatMessagesIOModel) => void) {
         this.on("join", (response) => {
             cb(new ChatIOModel(response.models.chat),

@@ -205,7 +205,8 @@ class ChatMessageBusiness extends BaseBusiness {
             .then(result => {
                 return {
                     _id: result._id,
-                    messages: result.messages.map(_ => new ChatMessageIOModel(_))
+                    messages: result.messages.map(_ => new ChatMessageIOModel(_)),
+                    date: cond.date
                 }
             });
     }

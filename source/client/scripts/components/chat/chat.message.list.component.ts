@@ -3,14 +3,14 @@ import {Component} from  "angular2/core";
 import UserManerger from "../../manergers/user.manerger";
 import UserIOModel from "../../../../common/models/io/common/user.io.model";
 import ChatIOModel from "../../../../common/models/io/chat/chat.io.model";
-import {ChatMessageIOModel, ChatMessageDataIOModel} from "../../../../common/models/io/chat/chat.message.io.model";
-import LinkPipe from "../../directives/link.pipe";
+import {ChatMessageIOModel} from "../../../../common/models/io/chat/chat.message.io.model";
+import ChatMessageComponent from "./chat.message.component";
 
 @Component({
     selector: "chat-message-list",
     templateUrl: "scripts/components/chat/chat.message.list.html",
     inputs: ["chat", "messages"],
-    pipes: [LinkPipe]
+    directives: [ChatMessageComponent]
 })
 class ChatMessageListComponent {
     private chat: ChatIOModel;
@@ -19,10 +19,6 @@ class ChatMessageListComponent {
 
     constructor(manerger: UserManerger) {
         this.user = manerger.user;
-    }
-
-    private createMaterialsPath(message: ChatMessageDataIOModel): string {
-        return `material/chat/files?_id=${this.chat._id}&file=${message.data}`;
     }
 }
 

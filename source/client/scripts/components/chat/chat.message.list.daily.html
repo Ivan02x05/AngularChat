@@ -7,7 +7,7 @@
     <div [id]="'daily_'+i" class="collapse">
         <chat-message-list [chat]="chat" [messages]="daily.messages"></chat-message-list>
         <div class="chat-message" *ngIf="daily.unshown != null && daily.unshown != 0">
-            <button class="btn btn-success btn-block btn-sm" [disabled]="connecting"  (click)="getMessageList(daily);">show more ({{daily.unshown}})</button>
+            <button class="btn btn-success btn-block btn-sm" (click)="getMessageList(daily);">show more ({{daily.unshown}})</button>
         </div>
     </div>
 </div>

@@ -1,29 +1,39 @@
-import {Component, provide} from  "angular2/core";
+import {Component, OnInit, OnDestroy, EventEmitter} from  "angular2/core";
 
 import ChatService from "../../services/chat.socket.service";
 import {ChatIOModel} from "../../../../common/models/io/chat/chat.io.model";
 import {ChatMessagesIOModel, ChatMessageIOModel, ChatGetMessageListIOModel}
 from "../../../../common/models/io/chat/chat.message.io.model";
 
-import ChatMessageListAbstractComponent from "./chat.message.list.abstract.component";
 import ChatMessageListComponent from "./chat.message.list.component";
 import * as dateutil from "../../../../common/utils/date.util";
 
 @Component({
     directives: [ChatMessageListComponent],
     selector: "chat-message-list-daily",
-    templateUrl: "scripts/components/chat/chat.message.list.daily.html"
+    templateUrl: "scripts/components/chat/chat.message.list.daily.html",
+    inputs: ["chat", "messages"],
+    outputs: ["onPushMessage"]
 })
-class ChatMessageListDailyComponent extends ChatMessageListAbstractComponent {
+class ChatMessageListDailyComponent implements OnInit, OnDestroy {
+    private chat: ChatIOModel;
+    private messages: ChatMessagesIOModel;
+
+    private onPushMessage: EventEmitter<ChatMessagesIOModel> =
+    new EventEmitter<ChatMessagesIOModel>();
+
+    private service: ChatService;
+
+    private chatEvents = [];
     private dailymessages: ChatMessagesIOModel[] = [];
+    private unpushed: ChatMessagesIOModel[] = [];
 
     constructor(service: ChatService) {
-        super(service);
+        this.service = service;
     }
 
     public ngOnInit() {
-        super.ngOnInit();
-
+        this.initService();
         this.service.getMessageDailyList(new ChatIOModel(
             {
                 _id: this.chat._id
@@ -31,62 +41,35 @@ class ChatMessageListDailyComponent extends ChatMessageListAbstractComponent {
         ));
     }
 
-    public ngOnDestroy() {
-        super.ngOnDestroy();
-
-        this.updateMessages();
-    }
-
-    private updateMessages() {
-        // clear
-        this.messages.unshown = 0;
-        this.messages.messages.splice(0, this.messages.messages.length);
-
-        let straight = true;
-        for (let day of this.dailymessages) {
-            if (straight) {
-                day.messages.forEach(_ => {
-                    this.messages.messages.push(_);
-                });
-                if (day.unshown != null && day.unshown > 0) {
-                    straight = false;
-                    this.messages.unshown = day.unshown;
-                }
-            } else
-                this.messages.unshown += (day.messages.length + day.unshown);
-        }
-        if (this.messages.unshown == 0)
-            this.messages.unshown = null;
-    }
-
-    protected initService() {
-        super.initService();
-
-        const index = this.chatEvents.length;
+    private initService() {
         this.chatEvents.push(this.onMessageDailyList.bind(this));
-        this.service.onMessageDailyList = this.chatEvents[index + 0];
+        this.service.onMessageDailyList = this.chatEvents[0];
         this.chatEvents.push(this.onMessageList.bind(this));
-        this.service.onMessageList = this.chatEvents[index + 1];
+        this.service.onMessageList = this.chatEvents[1];
+        this.chatEvents.push(this.onAddMessage.bind(this));
+        this.service.onAddMessageRoom = this.chatEvents[2];
     }
 
-    protected onAddMessage(chat: ChatIOModel, message: ChatMessageIOModel): boolean {
-        if (super.onAddMessage(chat, message)) {
-            if (this.dailymessages.length == 0
-                || !dateutil.equals(this.dailymessages[0].date, dateutil.toYyyymmdd(message.time)))
-                this.dailymessages.unshift(new ChatMessagesIOModel(
-                    {
-                        _id: this.chat._id,
-                        messages: [],
-                        date: dateutil.toYyyymmdd(message.time)
-                    }
-                ));
-            this.dailymessages[0].messages.unshift(message);
-            return true;
-        } else
-            return false;
+    public ngOnDestroy() {
+        this.chatEvents.forEach(_ => {
+            this.service.off(_);
+        });
     }
 
-    public onMessageDailyList(daily: ChatMessagesIOModel[]) {
+    private onAddMessage(message: ChatMessageIOModel) {
+        if (this.dailymessages.length == 0
+            || !dateutil.equals(this.dailymessages[0].date, dateutil.toYyyymmdd(message.time)))
+            this.dailymessages.unshift(new ChatMessagesIOModel(
+                {
+                    _id: this.chat._id,
+                    messages: [],
+                    date: dateutil.toYyyymmdd(message.time)
+                }
+            ));
+        this.dailymessages[0].messages.unshift(message);
+    }
+
+    private onMessageDailyList(daily: ChatMessagesIOModel[]) {
         let count = 0;
         this.dailymessages = daily;
         for (let day of this.dailymessages) {
@@ -105,8 +88,7 @@ class ChatMessageListDailyComponent extends ChatMessageListAbstractComponent {
         }
     }
 
-    public getMessageList(model: ChatMessagesIOModel) {
-        this.connecting = true;
+    private getMessageList(model: ChatMessagesIOModel) {
         this.service.getMessageList(new ChatGetMessageListIOModel(
             {
                 _id: model._id,
@@ -116,18 +98,52 @@ class ChatMessageListDailyComponent extends ChatMessageListAbstractComponent {
         ));
     }
 
-    public onMessageList(messages: ChatMessagesIOModel) {
-        this.connecting = false;
+    private onMessageList(messages: ChatMessagesIOModel) {
+        // 表示を更新
+        const day = this.dailymessages.filter(_ => dateutil
+            .equals(_.date, messages.date))[0];
 
-        const day = this.dailymessages.filter(_ => dateutil.equals(_.date, dateutil
-            .toYyyymmdd(messages.messages[0].time)))[0];
-        for (let message of messages.messages)
+        for (let message of messages.messages) {
             day.messages.push(message);
+            day.unshown--;
+        }
 
-        day.unshown = messages.unshown;
+        // 退避 or 通知
+        const unpushedbefore = this.unpushed.filter(_ => _.date >= day.date);
+        let index = this.dailymessages.indexOf(day);
+        if (unpushedbefore.length > 0 || (index > 0 && this.dailymessages[index - 1].unshown > 0)) {
+            // 退避
+            if (unpushedbefore.length == 0)
+                this.unpushed.splice(0, 0, messages);
+            else if (!dateutil.equals(unpushedbefore[0].date, day.date)) {
+                index = this.unpushed.indexOf(unpushedbefore[0]);
+                this.unpushed.splice(index + 1, 0, messages);
+            } else {
+                for (let message of messages.messages)
+                    unpushedbefore[0].messages.push(message);
+            }
+        } else {
+            // 通知
+            const push = new ChatMessagesIOModel({
+                messages: messages.messages
+            });
+            if (day.unshown == 0) {
+                const unpushedafter = this.unpushed.filter(_ => _.date < day.date);
+                for (let unpushed of unpushedafter) {
+                    for (let message of unpushed.messages)
+                        push.messages.push(message);
+
+                    this.unpushed.splice(this.unpushed.indexOf(unpushed), 1);
+                    if (unpushed.unshown > 0)
+                        break;
+                }
+            }
+
+            this.onPushMessage.next(push);
+        }
     }
 
-    public getMessagesList(): ChatMessageIOModel[] {
+    public getDispMessage(): ChatMessageIOModel[] {
         const messages: ChatMessageIOModel[] = [];
         this.dailymessages.forEach(d => {
             d.messages.forEach(m => {

@@ -121,12 +121,6 @@ class ChatService extends BaseService {
             .then(_ => business.findByIdSelectMessages({ id: model._id, skip: model.skip, date: model.date }))
             .then(_ => new ChatMessagesIOModel(_))
             .then(_ => {
-                _.unshown = model.skip - _.messages.length;
-                if (_.unshown <= 0)
-                    _.unshown = null;
-                return _;
-            })
-            .then(_ => {
                 result.add("messages", _);
             });
     }

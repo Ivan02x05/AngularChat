@@ -25,13 +25,13 @@
         <chat-message-search #inputCmp [chat]="chat" *ngIf="mode==modes.Search"></chat-message-search>
     </div>
     <div class="panel-body chat-message-list border-bottom-1" [class.chat-message-list-error]="hasInputError" *ngIf="chat != null && messages != null && toggled">
-        <chat-message-list-normal #outputCmpl [chat]="chat" [messages]="messages" *ngIf="mode==modes.Normal"></chat-message-list-normal>
-        <chat-message-list-daily #outputCmpl [chat]="chat" [messages]="messages" *ngIf="mode==modes.Daily"></chat-message-list-daily>
-        <chat-message-list-search #outputCmpl [chat]="chat" [messages]="messages" *ngIf="mode==modes.Search"></chat-message-list-search>
+        <chat-message-list-normal #outputCmpl [chat]="chat" [messages]="messages" (onPushMessage)="onPushMessage($event);" *ngIf="mode==modes.Normal"></chat-message-list-normal>
+        <chat-message-list-daily #outputCmpl [chat]="chat" [messages]="messages" (onPushMessage)="onPushMessage($event);" *ngIf="mode==modes.Daily"></chat-message-list-daily>
+        <chat-message-list-search #outputCmpl [chat]="chat" *ngIf="mode==modes.Search"></chat-message-list-search>
     </div>
     <div class="panel-body chat-btn-list" *ngIf="chat != null && messages != null && toggled">
-        <button class="btn btn-primary btn-xs" [disabled]="downloading" (click)="onDownloadDisped();">ダウンロード(表示のみ)</button>
-        <button class="btn btn-primary btn-xs" [disabled]="downloading" (click)="onDownloadAll();">ダウンロード(全件)</button>
+        <button class="btn btn-primary btn-xs" (click)="onDownloadDisped();">ダウンロード(表示のみ)</button>
+        <button class="btn btn-primary btn-xs" (click)="onDownloadAll();">ダウンロード(全件)</button>
         <a href="#" style="display:none" #downloadBtn download="messages.csv" (click)="onDownloadCommon();"></a>
     </div>
 </div>

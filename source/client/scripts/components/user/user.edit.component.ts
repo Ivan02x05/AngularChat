@@ -1,4 +1,4 @@
-import {Component, provide, Input, Output, EventEmitter, ViewChild} from  "angular2/core";
+import {Component, provide, Input, EventEmitter, ViewChild} from  "angular2/core";
 
 import {default as FormComponent, FORM_DIRECTIVES} from "../common/form.component";
 import UserService from "../../services/user.http.service";
@@ -92,8 +92,6 @@ class UserEditComponent extends FormComponent {
     }
 
     private edit(mode: Mode) {
-        this.clearError();
-
         this.submit(() => {
             let method: (model: UserIOModelOrg) => Observable<ResponseIOModel>;
             switch (mode) {

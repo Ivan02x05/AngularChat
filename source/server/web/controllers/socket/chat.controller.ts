@@ -217,6 +217,9 @@ class ChatController extends SocketBaseController {
                     if (rooms[r] == model.chat._id) {
                         this.chatViewedNo.chats.filter(_ => _.chatId == model.chat._id)[0]
                             .messageId = model.message._id;
+
+                        this.emit("addmessageroom", new ResponseIOModel({ models: { message: model.message }, errors: null }),
+                            model.sender == this.socket.id);
                         break;
                     }
                 }

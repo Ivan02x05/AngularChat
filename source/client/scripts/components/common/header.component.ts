@@ -25,7 +25,7 @@ class HeaderComponent {
     private router: Router;
     private systemname = SystemConstant.SYSTEM_NAME;
     @Output()
-    public onTop: EventEmitter<void> = new EventEmitter<void>();
+    private onTop: EventEmitter<void> = new EventEmitter<void>();
 
     constructor(manerger: UserManerger, router: Router) {
         this.manerger = manerger;

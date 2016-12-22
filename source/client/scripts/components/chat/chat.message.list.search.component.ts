@@ -1,38 +1,51 @@
-import {Component, provide} from  "angular2/core";
+import {Component, OnInit, OnDestroy} from  "angular2/core";
 
 import ChatService from "../../services/chat.socket.service";
 import ChatIOModel from "../../../../common/models/io/chat/chat.io.model";
 import {ChatMessagesIOModel, ChatMessageIOModel, ChatSearchMessagesIOModel}
 from "../../../../common/models/io/chat/chat.message.io.model";
 
-import ChatMessageListAbstractComponent from "./chat.message.list.abstract.component";
 import ChatMessageListComponent from "./chat.message.list.component";
 
 @Component({
     directives: [ChatMessageListComponent],
     selector: "chat-message-list-search",
-    templateUrl: "scripts/components/chat/chat.message.list.search.html"
+    templateUrl: "scripts/components/chat/chat.message.list.search.html",
+    inputs: ["chat, messages"]
 })
-class ChatMessageListSearchComponent extends ChatMessageListAbstractComponent {
+class ChatMessageListSearchComponent implements OnInit, OnDestroy {
+    private chat: ChatIOModel;
+    private messages: ChatMessagesIOModel;
+
+    private service: ChatService;
+
+    private chatEvents = [];
     private search: ChatMessageIOModel[] = [];
 
     constructor(service: ChatService) {
-        super(service);
+        this.service = service;
     }
 
-    protected initService() {
-        super.initService();
+    public ngOnInit() {
+        this.initService();
+    }
 
-        const index = this.chatEvents.length;
+    private initService() {
         this.chatEvents.push(this.onMessageList.bind(this));
-        this.service.onMessageList = this.chatEvents[index + 0];
+        this.service.onMessageList = this.chatEvents[0];
+    }
+
+    public ngOnDestroy() {
+        this.chatEvents.forEach(_ => {
+            this.service.off(_);
+        });
     }
 
     private onMessageList(messages: ChatMessagesIOModel) {
         this.search = messages.messages;
     }
 
-    public getMessagesList(): ChatMessageIOModel[] {
+    public getDispMessage(): ChatMessageIOModel[] {
         return this.search;
     }
 }

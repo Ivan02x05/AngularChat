@@ -57,7 +57,6 @@ class ChatMessageRegistComponent extends FormComponent implements OnInit {
     }
 
     private addMessage() {
-        this.clearError();
         this.submit(() => {
             this.service.addMessage(new ChatAddMessageIOModel(
                 {

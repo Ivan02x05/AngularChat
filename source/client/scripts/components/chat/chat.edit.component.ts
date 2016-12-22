@@ -45,19 +45,19 @@ class PermissionValidator extends ValidatorBase {
 class ChatEditComponent extends FormComponent implements OnInit, OnDestroy {
     private service: ChatService;
 
+    private editable: boolean = true;
+    private chatEvents = [];
+
     private cache: ChatIOModel;
     private _model: ChatIOModel = new ChatIOModel();
     private set model(model: ChatIOModel) {
         this._model = new ChatIOModel(model);
         this.cache = model;
-        this.editable = model == null;
+        this.editable = false;
     }
     private get model(): ChatIOModel {
         return this._model;
     }
-
-    private editable: boolean = true;
-    private chatEvents = [];
 
     constructor(service: ChatService) {
         super();
@@ -85,9 +85,7 @@ class ChatEditComponent extends FormComponent implements OnInit, OnDestroy {
     }
 
     private cancel() {
-        this.clearError();
-        this.model = new ChatIOModel(this.cache);
-        this.editable = false;
+        this.model = this.cache;
     }
 
     private regist() {
@@ -97,7 +95,6 @@ class ChatEditComponent extends FormComponent implements OnInit, OnDestroy {
     }
 
     private update() {
-        this.clearError();
         this.submit(() => {
             this.service.update(this.model);
         });

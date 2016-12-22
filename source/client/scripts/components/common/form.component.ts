@@ -63,6 +63,7 @@ abstract class FormComponent {
     }
 
     protected submit(cb: () => void) {
+        this.clearError();
         const controls = this.form.controls;
         for (let c in controls) {
             controls[c].updateValueAndValidity();

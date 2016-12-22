@@ -57,7 +57,6 @@ class ChatMessageSearchComponent extends FormComponent implements OnInit {
 
 
     private search() {
-        this.clearError();
         this.submit(() => {
             this.service.search(new ChatSearchMessagesIOModel(
                 {
