@@ -11,7 +11,7 @@ import ChatMessageListComponent from "./chat.message.list.component";
     directives: [ChatMessageListComponent],
     selector: "chat-message-list-search",
     templateUrl: "scripts/components/chat/chat.message.list.search.html",
-    inputs: ["chat, messages"]
+    inputs: ["chat", "messages"]
 })
 class ChatMessageListSearchComponent implements OnInit, OnDestroy {
     private chat: ChatIOModel;
