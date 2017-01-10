@@ -10,6 +10,7 @@ const favicon = require("serve-favicon");
 const uuid = require("uuid");
 const redis = require('connect-redis')(session);
 
+import domainerrorhandler from "../handlers/domain.error.handler";
 import errorhandler from "../handlers/error.handler";
 import redirecterrorhandler from "../handlers/redirect.error.handler";
 import {decode as sessiondecoder} from "../handlers/session.handler";
@@ -49,6 +50,7 @@ class WwwServer {
         this.app.set("views", path.join(BASE_DIR, "web/views"));
         this.app.set("view engine", "jade");
 
+        this.app.use(domainerrorhandler(redirecterrorhandler));
         this.app.use(cookieparser(config.session_secret_key));
         this.app.use(bodyparser.json());
         this.app.use(session(

@@ -44,10 +44,10 @@ class HeaderComponent {
     }
 
     private logout() {
-        this.manerger.clear()
+        this.manerger.logout()
             .subscribe(
-            () => { },
-            () => { },
+            null,
+            null,
             () => {
                 this.router.navigate(["Login"]);
             }

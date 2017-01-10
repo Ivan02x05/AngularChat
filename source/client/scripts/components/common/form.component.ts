@@ -21,12 +21,9 @@ abstract class FormComponent {
         this.user = UserManerger.instanse.user;
     }
 
-    private get messageMgr(): MessageManerger {
-        return InjectManerger.injector.get(MessageManerger);
-    }
-
     protected getMessage(code: string, args?: string[]): MessageIOModel {
-        return this.messageMgr.getMessage(code, args);
+        return InjectManerger.injector.get(MessageManerger)
+            .getMessage(code, args);
     }
 
     protected get hasError(): boolean {

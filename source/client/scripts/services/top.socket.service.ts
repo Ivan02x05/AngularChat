@@ -10,8 +10,8 @@ class TopService extends SocketService {
         this.initialize("top");
     }
 
-    public set onLogout(cb: () => void) {
-        this.on("logout", (response) => {
+    public set onDelete(cb: () => void) {
+        this.on("delete", (response) => {
             cb();
         });
     }
@@ -20,10 +20,6 @@ class TopService extends SocketService {
         this.on("update", (response) => {
             cb(new UserIOModel(response.models.user));
         });
-    }
-
-    public logout() {
-        this.emit("logout");
     }
 }
 

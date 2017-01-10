@@ -20,3 +20,9 @@ export default function handle(error: Error, socket: SocketIO.Socket,
         );
     });
 }
+
+export function handleAndEmit(error: Error, socket: SocketIO.Socket) {
+    handle(error, socket, model => {
+        socket.emit("failure", model.data);
+    });
+}

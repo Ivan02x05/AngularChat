@@ -6,7 +6,7 @@ import {ErrorConstant} from "../../../common/constants/error.constant";
 const logger = require("../../common/utils/log.util").error;
 
 export default function handle(error: Error, req: express.Request,
-    res: express.Response, next: (error?: Error) => void) {
+    res: express.Response, next: (exception: Exception) => void) {
 
     const loginInfo = (<any>req).session != null ? (<any>req).session.user : null;
     const log = {

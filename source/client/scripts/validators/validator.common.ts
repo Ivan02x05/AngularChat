@@ -13,6 +13,10 @@ export abstract class ValidatorBase implements Validator {
     protected result: ValidatorResult;
     protected manerger: MessageManerger;
 
+    constructor() {
+        this.manerger = InjectManerger.injector.get(MessageManerger);
+    }
+
     validate(control: AbstractControl): ValidatorResult {
         this.result = {};
         this.validateControl(control);
@@ -22,8 +26,7 @@ export abstract class ValidatorBase implements Validator {
     abstract validateControl(control: AbstractControl);
 
     protected add(code: string, ...params: string[]) {
-        const manerger: MessageManerger = InjectManerger.injector.get(MessageManerger);
-        const message = manerger.getMessage(code, params);
+        const message = this.manerger.getMessage(code, params);
         this.result[code] = new ErrorIOModel(message.code,
             message.message, message.level);
     }

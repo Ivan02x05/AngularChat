@@ -16,11 +16,11 @@ class HttpService {
         this.http = http;
     }
 
-    protected get headers(): Headers {
+    private get headers(): Headers {
         return new Headers();
     }
 
-    protected get jsonheaders(): Headers {
+    private get jsonheaders(): Headers {
         const headers = this.headers;
         headers.append("Content-Type", "application/json");
         return headers;
@@ -37,22 +37,17 @@ class HttpService {
     }
 
     private execute(observable: Observable<Response>): Observable<ResponseIOModel> {
-        return Observable.create((observer) => {
-            observable
-                .map((response) => response.json())
-                .subscribe(
-                (data) => observer.next(new ResponseIOModel(data)),
-                (error) => {
-                    const json = error.json();
-                    if (json.errors && Array.isArray(json.errors))
-                        throw new Exception(json.errors
-                            .map(_ => new ErrorIOModel(_.code, _.message, _.level)));
-                    else
-                        throw new Error(error.text());
-                },
-                () => { observer.complete(); }
-                );
-        });
+        return observable
+            .map(response => response.json())
+            .map(response => new ResponseIOModel(response))
+            .catch(error => {
+                const json = error.json();
+                if (json.errors && Array.isArray(json.errors))
+                    return Observable.throw(new Exception(json.errors
+                        .map(_ => new ErrorIOModel(_.code, _.message, _.level))));
+                else
+                    return Observable.throw(new Error(error.text()));
+            });
     }
 }
 

@@ -6,27 +6,23 @@ import MessageIOModel from "../../../common/models/io/common/message.io.model";
 
 @Injectable()
 class MessageManerger {
-    private observable: Observable<MessageManerger>;
+    private service: MessageService;
     private messages: Map<string, MessageIOModel> = new Map<string, MessageIOModel>();
 
     constructor(service: MessageService) {
-        this.observable = Observable.create((observer) => {
-            service.list()
-                .map((response) => <MessageIOModel[]>response.models.messages)
-                .subscribe(
-                (messages) => {
-                    messages.map((message) => {
-                        this.messages.set(message.code, message);
-                    });
-                    observer.next(this);
-                    observer.complete();
-                }
-                );
-        });
+        this.service = service;
     }
 
-    public initialize() {
-        return this.observable;
+    public initialize(): Observable<MessageManerger> {
+        return this.service.list()
+            .map(response => response.models.messages
+                .map(_ => new MessageIOModel(_)))
+            .flatMap(messages => {
+                messages.forEach(message => {
+                    this.messages.set(message.code, message);
+                });
+                return Observable.of(this);
+            })
     }
 
     public getMessage(code: string, args?: string[]): MessageIOModel {

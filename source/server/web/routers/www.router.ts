@@ -1,12 +1,16 @@
 import * as express from "express";
 
 import * as common from "./router.common";
+import domainerrorhandler from "../handlers/domain.error.handler";
 import errorhandler from "../handlers/error.handler";
 import jsonerrorhandler from "../handlers/json.error.handler";
 import redirecterrorhandler from "../handlers/redirect.error.handler";
 import authhandler from "../handlers/auth.handler";
 
 const router: express.Router = express.Router();
+
+router.use("/login/index", domainerrorhandler(redirecterrorhandler));
+router.use("/:controller/:method", domainerrorhandler(jsonerrorhandler));
 
 router.get("/", function(req: express.Request
     , res: express.Response, next: Function) {

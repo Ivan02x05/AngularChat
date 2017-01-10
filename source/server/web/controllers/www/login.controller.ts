@@ -22,10 +22,21 @@ class LoginController extends WwwBaseController {
     protected login(model?: UserIOModel, service?: LoginService): Q.Promise<void> {
         return service.login(model)
             .then((result: ServiceResult) => {
-                // set session
                 this.session.user = <UserIOModel>result.get("user");
                 this.json(result);
+            });
+    }
+
+    @method()
+    protected logout(): Q.Promise<void> {
+        return Q.fcall<boolean>(() => this.session != null)
+            .then(flag => {
+                if (flag)
+                    return Q.nfcall(this.session.destroy.bind(this.session))
             })
+            .then(() => {
+                this.json(new ResponseIOModel());
+            });
     }
 }
 

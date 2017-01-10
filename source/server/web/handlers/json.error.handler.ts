@@ -6,7 +6,7 @@ import ResponseIOModel from "../../../common/models/io/common/response.io.model"
 import {ErrorConstant} from "../../../common/constants/error.constant";
 
 export default function handle(error: Exception, req: express.Request,
-    res: express.Response, next: (error?: Error) => void) {
+    res: express.Response) {
 
     const model = new ResponseIOModel();
     model.errors = error.errors;

@@ -1,5 +1,5 @@
 import {NgControlName} from "angular2/common";
-import {Component, Input, OnInit, OptionalMetadata} from "angular2/core";
+import {Component, Input, OnInit, Optional} from "angular2/core";
 
 import {ValidatorResult} from "../../validators/validator.common";
 import FormGroupDirective from "../../directives/form-group.directive";
@@ -9,13 +9,12 @@ import ErrorIOModel from "../../../../common/models/io/common/error.io.model";
     selector: "control-error",
     templateUrl: "scripts/components/common/control.error.html"
 })
-@(<any>Reflect).metadata("parameters", [[new OptionalMetadata()]])
 class ControlErrorComponent implements OnInit {
     @Input("target") private control: NgControlName;
     private error: ErrorIOModel;
     private formGroup: FormGroupDirective;
 
-    constructor(formGroup: FormGroupDirective) {
+    constructor( @Optional() formGroup: FormGroupDirective) {
         this.formGroup = formGroup;
     }
 

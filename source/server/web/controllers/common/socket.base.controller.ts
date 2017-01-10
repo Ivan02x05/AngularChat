@@ -10,7 +10,7 @@ import SessionIOModel from "../../../../common/models/io/common/session.io.model
 import ServiceResult from "../../../service/common/service.result";
 import BaseServide from "../../../service/common/base.service";
 import ResponseIOModel from "../../../../common/models/io/common/response.io.model";
-import errorhandler from "../../handlers/socket.error.handler";
+import {handleAndEmit} from "../../handlers/socket.error.handler";
 import authhandler from "../../handlers/auth.handler";
 import {decode as sessiondecoder} from "../../handlers/session.handler";
 import {inject} from "../../../common/container/inject.decorator";
@@ -58,9 +58,7 @@ export abstract class SocketBaseController extends BaseController {
     }
 
     protected onError(error: Error) {
-        errorhandler(error, this.socket, model => {
-            this.socket.emit("failure", model.data);
-        });
+        handleAndEmit(error, this.socket);
     }
 
     protected onConnect(): Q.Promise<void> {

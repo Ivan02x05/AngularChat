@@ -1,36 +1,32 @@
 import {Injectable} from  "angular2/core";
-import * as rxjs from "rxjs/Rx";
+import {Observable} from "rxjs/Rx";
 
 import DivisionService from "../services/division.http.service";
 import DivisionIOModel from "../../../common/models/io/common/division.io.model";
 
 @Injectable()
 class DivisionManerger {
-    private observable: rxjs.Observable<DivisionManerger>;
+    private service: DivisionService;
     private divisions: Map<string, Map<string, DivisionIOModel>> =
     new Map<string, Map<string, DivisionIOModel>>();
 
     constructor(service: DivisionService) {
-        this.observable = rxjs.Observable.create((observer) => {
-            service.list()
-                .map((response) => <DivisionIOModel[]>response.models.divisions)
-                .subscribe(
-                (divisions) => {
-                    divisions.map(_ => {
-                        if (!this.divisions.has(_.code))
-                            this.divisions.set(_.code, new Map<string, DivisionIOModel>());
-
-                        this.divisions.get(_.code).set(_.subcode, new DivisionIOModel(_));
-                    });
-                    observer.next(this);
-                    observer.complete();
-                }
-                );
-        });
+        this.service = service;
     }
 
-    public initialize() {
-        return this.observable;
+    public initialize(): Observable<DivisionManerger> {
+        return this.service.list()
+            .map(response => response.models.divisions
+                .map(_ => new DivisionIOModel(_)))
+            .flatMap(divisions => {
+                divisions.forEach(_ => {
+                    if (!this.divisions.has(_.code))
+                        this.divisions.set(_.code, new Map<string, DivisionIOModel>());
+
+                    this.divisions.get(_.code).set(_.subcode, _);
+                });
+                return Observable.of(this);
+            });
     }
 
     public getDivision(code: string, subcode: string): DivisionIOModel {

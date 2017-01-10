@@ -6,6 +6,7 @@ import ChatTopComponent from "./chat/chat.top.component";
 import UserTopComponent from "./user/user.top.component";
 import ApplicationErrorComponent from "./common/application.error.component";
 import ApplicationErrorDirective from "../directives/application.error.directive";
+import InjectManerger from "../manergers/inject.manerger";
 import UserManerger from "../manergers/user.manerger";
 
 @RouteConfig([
@@ -34,16 +35,18 @@ import UserManerger from "../manergers/user.manerger";
 @Component({
     selector: "angular-app",
     templateUrl: "scripts/components/app.html",
-    directives: [ROUTER_DIRECTIVES, ApplicationErrorDirective]
+    directives: [ROUTER_DIRECTIVES, ApplicationErrorDirective],
+    providers: [InjectManerger]
 })
 export class AppComponent implements OnDestroy {
-    private manerger: UserManerger;
+    private manerger: InjectManerger;
 
-    constructor(manerger: UserManerger) {
+    constructor(manerger: InjectManerger) {
         this.manerger = manerger;
     }
 
     public ngOnDestroy() {
-        this.manerger.clear();
+        (<UserManerger>this.manerger.injector
+            .get(UserManerger)).logout();
     }
 }

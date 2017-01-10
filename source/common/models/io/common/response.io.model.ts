@@ -24,21 +24,19 @@ export class ResponseIOModel {
     }
 
     public get hasInfo(): boolean {
-        const level = this.level;
-        return level != NON_ERROR
-            && level == ErrorConstant.ErrorLevel.Info;
+        return this.level == ErrorConstant.ErrorLevel.Info;
     }
 
     public get hasWarning(): boolean {
-        const level = this.level;
-        return level != NON_ERROR
-            && level == ErrorConstant.ErrorLevel.Warning;
+        return this.level == ErrorConstant.ErrorLevel.Warning;
     }
 
     public get hasError(): boolean {
-        const level = this.level;
-        return level != NON_ERROR
-            && level >= ErrorConstant.ErrorLevel.Error;
+        return this.level == ErrorConstant.ErrorLevel.Error;
+    }
+
+    public get hasFatal(): boolean {
+        return this.level == ErrorConstant.ErrorLevel.Fatal;
     }
 }
 

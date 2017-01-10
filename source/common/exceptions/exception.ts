@@ -66,6 +66,22 @@ abstract class AbstractException extends Error {
             return b.level - a.level;
         })[0].level;
     }
+
+    public get hasInfo(): boolean {
+        return this.level == ErrorConstant.ErrorLevel.Info;
+    }
+
+    public get hasWarning(): boolean {
+        return this.level == ErrorConstant.ErrorLevel.Warning;
+    }
+
+    public get hasError(): boolean {
+        return this.level == ErrorConstant.ErrorLevel.Error;
+    }
+
+    public get hasFatal(): boolean {
+        return this.level == ErrorConstant.ErrorLevel.Fatal;
+    }
 }
 
 export default AbstractException;

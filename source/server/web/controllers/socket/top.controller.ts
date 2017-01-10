@@ -9,7 +9,6 @@ import UserScaleoutModel from "../../scaleout/models/common/user.scaleout.model"
 class TopController extends SocketBaseController {
     protected initialize(): ON_MESSAGE_MAP {
         return {
-            "logout": this.onLogout
         };
     }
 
@@ -46,7 +45,15 @@ class TopController extends SocketBaseController {
 
     @scaleout()
     protected onUserDeleteSubscribe(model: UserScaleoutModel): Q.Promise<void> {
-        return this.onLogout();
+        const user = this.session.user;
+        return Q.nfcall(this.session.destroy.bind(this.session))
+            .then(() => {
+                this.emit("delete");
+                this.publish(SystemConstant.Scaleout.Events.Subscribe.Common
+                    .SESSION_CHANGE, new UserScaleoutModel({
+                        user: user
+                    }));
+            });
     }
 
     protected onClientProvide(): Q.Promise<UserScaleoutModel> {
@@ -54,19 +61,6 @@ class TopController extends SocketBaseController {
             sender: this.socket.id,
             user: this.session.user
         }));
-    }
-
-    @message()
-    protected onLogout(): Q.Promise<void> {
-        const user = this.session.user;
-        return Q.nfcall(this.session.destroy.bind(this.session))
-            .then(() => {
-                this.emit("logout");
-                this.publish(SystemConstant.Scaleout.Events.Subscribe.Common
-                    .SESSION_CHANGE, new UserScaleoutModel({
-                        user: user
-                    }));
-            });
     }
 }
 

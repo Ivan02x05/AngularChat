@@ -13,6 +13,10 @@ class LoginService {
     public login(model: UserIOModel) {
         return this.http.postJson("login/login", model);
     }
+
+    public logout() {
+        return this.http.postJson("login/logout");
+    }
 }
 
 export default LoginService;
