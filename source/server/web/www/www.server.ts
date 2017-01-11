@@ -74,7 +74,7 @@ class WwwServer {
         this.app.use("/framework", express.static(path.join(BASE_DIR, "../client/framework")));
         this.app.use("/framework", express.static(path.join(BASE_DIR, "../../node_modules")));
         this.app.use("/common", express.static(path.join(BASE_DIR, "../common")));
-        this.app.use(logger);
+        this.app.use(logger.connect());
         this.app.use("/api", require("../routers/api.router"));
         this.app.use("/material", require("../routers/material.router"));
         this.app.use(require("../routers/www.router"));

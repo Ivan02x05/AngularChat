@@ -1,11 +1,16 @@
 const log4js = require('log4js');
 import {inspect} from "util";
+import * as path from "path";
+import * as Q from "q";
 
 import Exception from "../exceptions/exception";
+import * as fileutil from "./file.util";
 
-log4js.configure('./bin/server/common/resources/config/log/log.json', { reloadSecs: 60 });
+const config = require("../resources/config/log/log.json");
 
-const logger = (logger) => {
+const logger = (name: string) => {
+    const logger = log4js.getLogger(name);
+    const level = log4js.levels.toLevel(config.levels[name]);
     const object2String = (obj: any) => {
         return inspect(obj, false, null);
     };
@@ -29,15 +34,26 @@ const logger = (logger) => {
         fatal: (ex: Exception) => {
             logger.fatal(object2String(ex));
         },
+        level: level,
+        connect: () => {
+            return log4js.connectLogger(logger, { level: level });
+        },
         object2String: object2String
-    }
-}
+    };
+};
+
+Q.all(
+    config.appenders
+        .map(_ => fileutil.mkdir(path.dirname(_.filename)))
+)
+    .then(() => {
+        log4js.configure("./bin/server/common/resources/config/log/log.json", { reloadSecs: 60 });
+    });
 
 export = {
-    www: log4js.connectLogger(log4js.getLogger("www"), { level: log4js.levels.INFO }),
-    access: logger(log4js.getLogger("access")),
-    error: logger(log4js.getLogger("error")),
-    system: logger(log4js.getLogger("system")),
-    db: logger(log4js.getLogger("db")),
-    levels: log4js.levels
-}
+    www: logger("www"),
+    access: logger("access"),
+    error: logger("error"),
+    system: logger("system"),
+    db: logger("db")
+};

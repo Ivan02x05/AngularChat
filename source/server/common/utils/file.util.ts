@@ -52,6 +52,15 @@ export function mkdir(p: string): Q.Promise<void> {
     });
 }
 
+export function mkdirSync(p: string) {
+    if (exists(p))
+        return;
+    else if (exists(path.dirname(p)))
+        fs.mkdirSync(p)
+    else
+        mkdirSync(path.dirname(p))
+}
+
 export function readdirSync(path: string): string[] {
     return fs.readdirSync(path);
 }
