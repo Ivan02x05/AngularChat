@@ -3,22 +3,22 @@ import {ErrorConstant} from "../../../common/constants/error.constant";
 import {Container} from "../../common/container/container";
 import MessageManerger from "../../common/manergers/message.manerger";
 
-export function required(value: any, name: string): ErrorIOModel {
+function required(value: any, name: string): ErrorIOModel {
     if (value == null || value.length == 0)
         return createError(ErrorConstant.Code.Error.REQUIRED, name);
 }
 
-export function maxlength(value: any, length: number, name: string): ErrorIOModel {
+function maxlength(value: any, length: number, name: string): ErrorIOModel {
     if (value != null && value.length > length)
         return createError(ErrorConstant.Code.Error.MAX_LENGTH, name, length.toString());
 }
 
-export function minlength(value: any, length: number, name: string): ErrorIOModel {
+function minlength(value: any, length: number, name: string): ErrorIOModel {
     if (value != null && value.length < length)
         return createError(ErrorConstant.Code.Error.MIN_LENGTH, name, length.toString());
 }
 
-export function justlength(value: any, length: number, name: string): ErrorIOModel {
+function justlength(value: any, length: number, name: string): ErrorIOModel {
     if (value != null && value.length != length)
         return createError(ErrorConstant.Code.Error.JUST_LENGTH, name, length.toString());
 }
