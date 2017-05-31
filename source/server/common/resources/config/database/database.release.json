@@ -1,12 +1,12 @@
 {
     "connection": {
         "default": {
-            "host": "localhost",
-            "database": "Angular",
+            "host": "angularchat.mongodb.db.vm.local",
+            "database": "angular_chat",
             "port": 27017,
             "options": {
-                "user": "AngularUser",
-                "pass": "P@ssword!"
+                "user": "angular",
+                "pass": "KohaShion0701"
             }
         }
     },

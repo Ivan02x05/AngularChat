@@ -28,11 +28,25 @@ const logger = (name: string) => {
         warn: (msg: string) => {
             logger.warn(msg);
         },
-        error: (ex: Exception) => {
-            logger.error(object2String(ex));
+        error: (msg: string | Exception, ex?: Exception) => {
+        	if (msg instanceof Exception) {
+        		ex = <Exception>msg;
+        		msg = null;
+        	}
+        	if (msg != null)
+        		logger.error(msg);
+        	if (ex != null)
+            	logger.error(object2String(ex));
         },
-        fatal: (ex: Exception) => {
-            logger.fatal(object2String(ex));
+        fatal: (msg: string | Exception, ex?: Exception) => {
+        	if (msg instanceof Exception) {
+        		ex = <Exception>msg;
+        		msg = null;
+        	}
+        	if (msg != null)
+        		logger.fatal(msg);
+        	if (ex != null)
+            	logger.fatal(object2String(ex));
         },
         level: level,
         connect: () => {

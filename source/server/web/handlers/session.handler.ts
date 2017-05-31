@@ -23,8 +23,8 @@ export function handshake(socket: SocketIO.Socket,
     const handshake = socket.handshake;
     if (handshake.headers.cookie) {
         const parsedcookie = cookie.parse(handshake.headers.cookie);
-        const sid = cookieparser.signedCookie(parsedcookie[config.session_name],
-            config.session_secret_key);
+        const sid = cookieparser.signedCookie(parsedcookie[config.session.name],
+            config.session.secret_key);
 
         (<any>store).get(sid, (error: Error, session) => {
             if (session) {

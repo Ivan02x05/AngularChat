@@ -27,7 +27,7 @@ class UserController extends WwwBaseController {
             .then((result: ServiceResult) => {
                 const users = <UserInfoIOModel[]>result.get("users");
                 const scaleout = Container.resolve(ScaleoutClient);
-                scaleout.get(SystemConstant.Scaleout.Events.Provide.Common.LOGIN_USER)
+                return scaleout.get(SystemConstant.Scaleout.Events.Provide.Common.LOGIN_USER)
                     .then((logins: UserScaleoutModel[]) => logins.map(_ => _.user._id))
                     .then(logins => {
                         users.forEach(_ => {

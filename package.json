@@ -1,8 +1,8 @@
 {
-  "name": "AngularChatProject",
+  "name": "AngularChat",
   "version": "1.0.0",
-  "description": "Angular Chat Project",
-  "main": "index.js",
+  "description": "Angular Chat",
+  "main": "bin/server/web/app.js",
   "devDependencies": {
     "babel-cli": "6.6.5",
     "babel-plugin-angular2-annotations": "5.0.0",

@@ -9,16 +9,20 @@ import authhandler from "../handlers/auth.handler";
 
 const router: express.Router = express.Router();
 
-router.use("/login/index", domainerrorhandler(redirecterrorhandler));
-router.use("/:controller/:method", domainerrorhandler(jsonerrorhandler));
-
-router.get("/", function(req: express.Request
+router.get("/", domainerrorhandler(redirecterrorhandler), function(req: express.Request
     , res: express.Response, next: Function) {
     req.params.controller = "login";
     req.params.method = "index";
 
     common.execute(req, res, next);
 });
+
+router.get("/:controller(keepalived)/:method(check)", function (req, res, next) {
+    res.end();
+});
+
+router.use("/login/index", domainerrorhandler(redirecterrorhandler));
+router.use("/:controller/:method", domainerrorhandler(jsonerrorhandler));
 
 router.get("*", function(req: express.Request
     , res: express.Response, next: Function) {

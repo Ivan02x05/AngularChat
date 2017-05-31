@@ -37,12 +37,16 @@ export class ScaleoutClient {
     private createRedis() {
         this.publisher = createRedisClient(
             config.redis.port,
-            config.redis.host
+            config.redis.host,
+            {
+            	password: config.redis.password
+            }
         );
         this.subscriber = createRedisClient(
             config.redis.port,
             config.redis.host,
             {
+            	password: config.redis.password,
                 return_buffers: true
             }
         );

@@ -13,6 +13,7 @@ import WwwServer from "./www/www.server";
 import SocketServer from "./www/socket.server";
 import ScaleoutClient from "./scaleout/client";
 import {Container} from "../common/container/container";
+import Exception from "../common/exceptions/exception";
 
 const logger = require("../common/utils/log.util").error;
 const config = require("../common/resources/config/www/www.json");
@@ -28,8 +29,7 @@ if (process.env.NODE_CLUSTER == 1 && cluster.isMaster) {
         cluster.fork();
 
     cluster.on("exit", (worker, code, signal) => {
-        console.error("スレッド停止[pid:%d][コード/シグナル:%s]。再起動開始。",
-            worker.process.pid, signal || code);
+    	logger.error(`スレッド停止[pid:${worker.process.pid}][コード/シグナル:${signal || code}]。再起動開始。`);
 
         cluster.fork();
     });
@@ -46,7 +46,7 @@ if (process.env.NODE_CLUSTER == 1 && cluster.isMaster) {
         .then(() => create(SocketServer))
         .then(() => create(ScaleoutClient))
         .then(() => Container.resolve(WwwServer).listen())
-        .catch(error => {
-            console.error(logger.object2String(error));
+        .catch((error: Exception) => {
+            logger.error(error);
         });
 }

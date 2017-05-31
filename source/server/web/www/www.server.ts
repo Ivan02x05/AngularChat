@@ -38,7 +38,8 @@ class WwwServer {
             {
                 host: config.redis.host,
                 port: config.redis.port,
-                prefix: config.redis.prefix,
+                prefix: config.session.prefix,
+                password: config.redis.password
             }
         );
     }
@@ -51,12 +52,12 @@ class WwwServer {
         this.app.set("view engine", "jade");
 
         this.app.use(domainerrorhandler(redirecterrorhandler));
-        this.app.use(cookieparser(config.session_secret_key));
+        this.app.use(cookieparser(config.session.secret_key));
         this.app.use(bodyparser.json());
         this.app.use(session(
             <session.SessionOptions>{
-                name: config.session_name,
-                secret: config.session_secret_key,
+                name: config.session.name,
+                secret: config.session.secret_key,
                 store: this.store,
                 resave: true,
                 saveUninitialized: false,
@@ -89,7 +90,7 @@ class WwwServer {
 
     public listen() {
         this.server.listen(this.app.get("port"), () => {
-            console.log("Wwwサーバー起動。");
+        	logger.info("wwwサーバー起動。");
         });
     }
 }

@@ -3,31 +3,31 @@
         {
             "type":     "dateFile",
             "category": "www",
-            "filename": "logs/www/www.log",
+            "filename": "/var/log/angular-chat/www.log",
             "pattern":  "-yyyy-MM-dd"
         },
         {
             "type":     "dateFile",
             "category": "access",
-            "filename": "logs/access/access.log",
+            "filename": "/var/log/angular-chat/access.log",
             "pattern":  "-yyyy-MM-dd"
         },
         {
             "type":     "dateFile",
             "category": "error",
-            "filename": "logs/error/error.log",
+            "filename": "/var/log/angular-chat/error.log",
             "pattern":  "-yyyy-MM-dd"
         },
         {
             "type":     "dateFile",
             "category": "system",
-            "filename": "logs/system/system.log",
+            "filename": "/var/log/angular-chat/system.log",
             "pattern":  "-yyyy-MM-dd"
         },
         {
             "type":     "dateFile",
             "category": "db",
-            "filename": "logs/db/db.log",
+            "filename": "/var/log/angular-chat/db.log",
             "pattern":  "-yyyy-MM-dd"
         }
     ],

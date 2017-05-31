@@ -25,7 +25,8 @@ class SocketServer {
         this.server = socketio(www.server, { path: "/framework/socket.io" });
         this.server.adapter(adapter({
             host: config.redis.host,
-            port: config.redis.port
+            port: config.redis.port,
+            password: config.redis.password
         }));
         this.server.use((socket: SocketIO.Socket, next: (error?: { data: ResponseIOModel }) => void) => {
             handshake(socket, www.store, next);

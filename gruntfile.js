@@ -6,7 +6,7 @@ module.exports = function(grunt) {
             env:"dev"
         },
         release: {
-            deploy: "D:/Ivan/angular_app/bin",
+            deploy: "C:/nodejs_dev/angular_chat/release/bin",
             env:"release"
         }
     },

@@ -1,15 +1,18 @@
 {
-  "port": "8092",
-  "session_name": "chat_application",
-  "session_secret_key": "b747cc73-4b39-4f04-b9f8-224def17e498",
+  "port": "8080",
+  "session": {
+    "name": "chat_application",
+    "secret_key": "b747cc73-4b39-4f04-b9f8-224def17e498",
+    "prefix": "sid:"
+  },
   "interval": {
     "updateSession": 60,
     "saveViewd": 60
   },
   "redis": {
-     "host": "localhost",
+     "host": "angularchat.redis.db.vm.local",
      "port": 6379,
-     "prefix": "sid:"
+     "password": "eib1zOgcffr)>xi>qhExfo=mu#7pbd"
   },
   "material": {
       "chat": {
@@ -17,6 +20,6 @@
       }
   },
   "scaleout": {
-    "timeout": 2
+    "timeout": 10
   }
 }
